@@ -7,22 +7,22 @@ const authRoute = require('./routes/authRoute');
 //configuring environment
 dotenv.config();
 
-connectDB().then(() => console.log('DB Connected'))
-    .catch(err => console.log(err));
+connectDB()
+    .then(() => {
+        const app = express();
 
-const app = express();
-//middlewares
-app.use(express.json());
-app.use(morgan('dev'));
-//routes
-app.use('/api/v1/auth', authRoute);
+        app.use(express.json());
+        app.use(morgan('dev'));
+        app.use('/api/v1/auth', authRoute);
 
-app.get('/', (req, res) => {
-    res.send(`<h1>Welcome to Omkara</h1>`);
-})
+        app.get('/', (req, res) => {
+            res.send(`<h1>Welcome to Omkara</h1>`);
+        });
 
-const PORT = process.env.PORT || 8080;
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+        const PORT = process.env.PORT || 8080;
+        app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+    })
+    .catch((error) => {
+        console.error('Database connection failed:', error);
+        process.exit(1);
+    });
