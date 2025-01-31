@@ -1,7 +1,7 @@
 import React from 'react';
 import {NavLink, Link} from "react-router-dom";
 import { MdOutlineShoppingCart } from "react-icons/md";
-const Header = () => {
+const Header = ({handleShowAuthModal}) => {
     return(
         <>
             <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -32,7 +32,7 @@ const Header = () => {
                             <NavLink to="/cart" className="nav-link align-content-center"><MdOutlineShoppingCart size={25} /></NavLink>
                             </li>
                             <li className="nav-item">
-                                <NavLink to="/register" className="nav-link" style={{textTransform:"capitalize"}}>SignUp / Login</NavLink>
+                              <span className="nav-link" style={{cursor: 'pointer'}} onClick={handleShowAuthModal}>Signup / Login</span>
                             </li>
                         </ul>
                     </div>

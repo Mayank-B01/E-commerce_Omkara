@@ -3,7 +3,7 @@ import Layout from "../components/Layout/Layout.jsx";
 
 const About = () => {
     return(
-        <Layout>
+        <Layout title={'About Us - Omkara'}>
             <h1>About</h1>
         </Layout>
     );

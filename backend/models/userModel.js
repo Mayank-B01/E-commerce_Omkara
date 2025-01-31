@@ -17,12 +17,12 @@ const userSchema = new mongoose.Schema({
     },
     phone:{
         type:String,
-        required:true,
+        required:false ,
         unique:true,
     },
     address:{
         type:String,
-        required:true,
+        required:false,
     },
     role:{
         type:Number,

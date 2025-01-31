@@ -3,7 +3,7 @@ import Layout from "../components/Layout/Layout.jsx";
 
 const Contact = () => {
     return(
-        <Layout>
+        <Layout title={'Contact Us - Omkara'}>
             <h1>Contact</h1>
         </Layout>
     );

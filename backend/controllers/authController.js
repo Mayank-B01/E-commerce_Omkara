@@ -18,7 +18,7 @@ const registerController = async (req, res) => {
         const existingUser = await userModel.findOne({email}, null, null);
         if(existingUser){
             return res.status(200).send({
-                success: true,
+                success: false,
                 message: 'User already exists'
             })
         }

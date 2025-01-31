@@ -3,7 +3,7 @@ import Layout from "../components/Layout/Layout.jsx";
 
 const Policy = () => {
     return(
-        <Layout>
+        <Layout title={'Privacy Policy - Omkara'}>
             <h1>Policy</h1>
         </Layout>
     );

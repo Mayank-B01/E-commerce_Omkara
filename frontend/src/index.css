@@ -12,6 +12,7 @@
   box-shadow: 0 8px 6px -6px grey;
   --webkit-box-shadow: 0 8px 6px -6px grey;
   border-bottom: solid grey !important;
+  background-color: #eae5cf !important;
 }
 
 .nav-link{
@@ -68,4 +69,112 @@
 .footer a:hover{
   color: white;
   border-bottom: 1px solid white;
+}
+.pagenotfound{
+  display: flex;
+  min-height: 50vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagenotfound-title{
+  font-size: 200px;
+  font-weight: 700;
+}
+
+.pagenotfound-heading{
+  font-weight: normal;
+}
+.pagenotfound-link{
+  color: #74ab6a;
+  border: 2px solid #74ab6a;
+}
+
+
+.register{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
+  flex-direction: column;
+}
+
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.register-content {
+  width: 900px;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.register-image {
+  background-color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.register-image img {
+  max-width: 80%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.image-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.register-form {
+  padding: 30px;
+}
+
+.register-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.or-divider {
+  margin-bottom: 15px;
+}
+
+.or-text {
+  margin: 0 10px;
+  color: #666;
+}
+
+.google-button {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.login-link {
+  text-align: center;
+}
+
+.login-link a {
+  color: #007bff;
 }

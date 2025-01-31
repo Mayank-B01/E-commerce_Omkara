@@ -3,7 +3,7 @@ import Layout from "../components/Layout/Layout.jsx";
 
 const Homepage = () => {
     return(
-      <Layout>
+      <Layout title={'Omkara'}>
             <h1>Homepage</h1>
       </Layout>
     );

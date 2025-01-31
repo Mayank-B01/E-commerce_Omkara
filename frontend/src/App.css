@@ -1,0 +1,15 @@
+.auth-modal .modal-dialog {
+    max-width: 80vw;
+    width: 90%;
+    max-height: 90vh;
+    height: 100%;
+    margin: auto;
+}
+
+.auth-modal .modal-content {
+    border-radius: 8px;
+}
+
+.auth-modal .modal-body {
+    padding: 2rem;
+}
