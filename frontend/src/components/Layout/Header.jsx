@@ -1,6 +1,6 @@
 import React from 'react';
-import {NavLink, UNSAFE_NavigationContext} from "react-router-dom";
-
+import {NavLink, Link} from "react-router-dom";
+import { MdOutlineShoppingCart } from "react-icons/md";
 const Header = () => {
     return(
         <>
@@ -12,16 +12,27 @@ const Header = () => {
                         <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="navbarTogglerDemo01">
-                        <NavLink to="/" className="navbar-brand" href="#">Hidden brand</NavLink>
-                        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                        <Link to="/" className="navbar-brand" ><img src="/icon.jpg" alt="Brand logo" className="h-12 w-auto object-contain" />Omkara</Link>
+                        <ul className="navbar-nav ms-auto mb-2 mb-0">
                             <li className="nav-item">
-                                <NavLink className="nav-link active" aria-current="page" href="#">Home</NavLink>
+                                <NavLink to="/" className="nav-link ">Home</NavLink>
                             </li>
                             <li className="nav-item">
-                                <NavLink className="nav-link" href="#">Link</NavLink>
+                                <NavLink to="/category" className="nav-link ">Categories</NavLink>
                             </li>
                             <li className="nav-item">
-                                <NavLink className="nav-link disabled" aria-disabled="true">Disabled</NavLink>
+                                <NavLink to="/about" className="nav-link ">About</NavLink>
+                            </li>
+                            <li className="nav-item">
+                                <NavLink to="/contact" className="nav-link ">Contact </NavLink>
+                            </li>
+                        </ul>
+                        <ul className="navbar-nav ms-auto mb-2 mb-0">
+                            <li className="nav-item">
+                            <NavLink to="/cart" className="nav-link align-content-center"><MdOutlineShoppingCart size={25} /></NavLink>
+                            </li>
+                            <li className="nav-item">
+                                <NavLink to="/register" className="nav-link" style={{textTransform:"capitalize"}}>SignUp / Login</NavLink>
                             </li>
                         </ul>
                     </div>
