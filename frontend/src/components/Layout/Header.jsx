@@ -1,7 +1,24 @@
-import React from 'react';
-import {NavLink, Link} from "react-router-dom";
-import { MdOutlineShoppingCart } from "react-icons/md";
+import React, {useState} from 'react';
+import {NavLink, Link, useNavigate} from "react-router-dom";
+import { MdOutlineShoppingCart, MdAccountCircle } from "react-icons/md";
+import {useAuth} from "../../context/auth.jsx";
+import {toast} from "react-toastify";
+
 const Header = ({handleShowAuthModal}) => {
+    const [auth, setAuth] = useAuth();
+    const [dropdownOpen, setDropdownOPen] = useState(false);
+    const navigate = useNavigate();
+
+    const handleLogout = () =>{
+        setAuth({
+            ...auth,
+            user:null,
+            token:''
+        })
+        localStorage.removeItem("auth");
+        toast.success("Logged out successful.")
+    }
+
     return(
         <>
             <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -31,9 +48,29 @@ const Header = ({handleShowAuthModal}) => {
                             <li className="nav-item">
                             <NavLink to="/cart" className="nav-link align-content-center"><MdOutlineShoppingCart size={25} /></NavLink>
                             </li>
-                            <li className="nav-item">
-                              <span className="nav-link" style={{cursor: 'pointer'}} onClick={handleShowAuthModal}>Signup / Login</span>
-                            </li>
+                            {
+                                !auth.user ? (<>
+                                    <li className="nav-item">
+                                        <span className="nav-link" style={{cursor: 'pointer'}} onClick={handleShowAuthModal}>Signup / Login</span>
+                                    </li>
+                                </>) : (<>
+                                    <li className="nav-item">
+                                       <span className="nav-link align-content-center"
+                                             style={{cursor:"pointer", position:"relative"}}
+                                             onClick={()=> setDropdownOPen(!dropdownOpen)}
+                                             ><MdAccountCircle size={25} />
+                                       </span>
+                                        {dropdownOpen && (
+                                            <div className="dropdown-menu show" style={{position:"absolute", right:0}}>
+                                                <NavLink to="/profile" className="dropdown-item" onClick={() => setDropdownOPen(false)}>
+                                                    Manage Account
+                                                </NavLink>
+                                                <NavLink to="/" className="dropdown-item" onClick={handleLogout} >Logout</NavLink>
+                                            </div>
+                                        )}
+                                    </li>
+                                </>)
+                            }
                         </ul>
                     </div>
                 </div>

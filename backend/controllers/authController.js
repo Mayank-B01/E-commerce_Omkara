@@ -5,9 +5,9 @@ const {comparePassword} = require("../utils/authHelp");
 
 const registerController = async (req, res) => {
     try{
-        const {name,email, password, phone, address} = req.body;
+        const {name,email, password, phone} = req.body;
         //validation
-        if(!name || !email || !password || !phone || !address){
+        if(!name || !email || !password || !phone){
             return res.send({
                 success: false,
                 message: 'Please provide all the required fields'
@@ -24,7 +24,7 @@ const registerController = async (req, res) => {
         }
 
         const hashedPassword = await hashPassword(password);
-        const user = await new userModel({name,email, password:hashedPassword, phone, address}).save();
+        const user = await new userModel({name,email, password:hashedPassword, phone:phone.trim()}).save();
         res.status(201).send({
             success: true,
             message: 'User created successfully',

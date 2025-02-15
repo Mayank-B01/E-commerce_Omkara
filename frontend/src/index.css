@@ -178,3 +178,17 @@
 .login-link a {
   color: #007bff;
 }
+
+/* Ensure the input container is relative */
+.position-relative {
+  position: relative;
+}
+
+/* Position the eye icon inside the input */
+.password-toggle-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+}

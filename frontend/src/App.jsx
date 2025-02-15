@@ -11,6 +11,8 @@ import Login from "./pages/Auth/Login.jsx";
 import Header from "./components/Layout/Header.jsx";
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+import Dashboard from "./pages/user/Dashboard.jsx";
+import PrivateRoute from "./components/routes/Private.jsx";
 
 function App() {
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -26,6 +28,7 @@ function App() {
         setShowAuthModal(true);
     };
 
+
     const handleCloseAuthModal = () => setShowAuthModal(false);
   return (
     <>
@@ -35,6 +38,9 @@ function App() {
            <Route path ='/about' element={<About />} />
            <Route path ='/contact' element={<Contact />} />
            <Route path ='/policy' element={<Policy />}/>
+           <Route path ='/dashboard' element={<PrivateRoute />}>
+               <Route path ='' element={<Dashboard />} />
+           </Route>
            <Route path ='*' element={<PagenotFound />}/>
        </Routes>
 
@@ -48,7 +54,7 @@ function App() {
                 {modalContent === 'register' ? (
                     <Register handleShowLogin={handleShowLogin} />
                 ) : (
-                    <Login handleShowRegister={handleShowRegister} />
+                    <Login handleShowRegister={handleShowRegister} handleCloseAuthModel={handleCloseAuthModal}/>
                 )}
             </Modal.Body>
         </Modal>

@@ -5,9 +5,11 @@ import { Row, Col } from 'react-bootstrap';
 import {toast} from 'react-toastify';
 import axios from 'axios';
 
+
 const Register = ({ handleShowLogin }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -15,15 +17,21 @@ const Register = ({ handleShowLogin }) => {
         e.preventDefault();
         try{
             if(password === confirmPassword) {
-                const res = await axios.post(`${process.env.REACT_API}/api/v1/auth/register`, {name,email,password});
-                toast.success('Registration Successful');
+                const res = await axios.post(`${import.meta.env.VITE_API}/api/v1/auth/register`, {name,email,password,phone});
+                if (res.data.success) {
+                    toast.success(res.data.message);
+                    handleShowLogin();
+                }
+                else{
+                    toast.error(res.data.message);
+                }
             }
             else{
                 toast.error('Password does not match');
             }
         }catch (e) {
             console.log(e);
-            toast.error(e.response.data.message);
+            toast.error(e.response?.data?.message || "Error occurred during registration");
         }
     }
     return (
@@ -39,7 +47,7 @@ const Register = ({ handleShowLogin }) => {
                 </Col>
                 <Col xs={12} md={4}>
                     <h2 className="mb-4 mt-0 pt-5">Sign Up</h2>
-                    <form onSubmit={ handlePassCheck}>
+                    <form onSubmit={handlePassCheck}>
                         <div className="mb-3">
                             <label htmlFor="registerName" className="form-label">
                                 Name
@@ -66,6 +74,20 @@ const Register = ({ handleShowLogin }) => {
                                 className="form-control"
                                 id="registerEmail"
                                 placeholder="Enter Email"
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="registerEmail" className="form-label">
+                                Phone
+                            </label>
+                            <input
+                                type="String"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                className="form-control"
+                                id="registerPhone"
+                                placeholder="Enter Phone number"
                                 required
                             />
                         </div>
@@ -105,14 +127,14 @@ const Register = ({ handleShowLogin }) => {
 
                         {/* OR Divider */}
                         <div className="d-flex align-items-center mb-3">
-                            <hr className="flex-grow-1" />
+                            <hr className="flex-grow-1"/>
                             <span className="mx-2">OR</span>
-                            <hr className="flex-grow-1" />
+                            <hr className="flex-grow-1"/>
                         </div>
 
                         {/* Continue with Google Button */}
                         <button type="button" className="btn btn-danger w-100 mb-3">
-                            <FaGoogle className="me-2" />
+                            <FaGoogle className="me-2"/>
                             Continue With Google
                         </button>
 
@@ -120,7 +142,7 @@ const Register = ({ handleShowLogin }) => {
                         <div className="text-center">
                             Already have an account?{' '}
                             <span
-                                style={{ color: 'blue', cursor: 'pointer' }}
+                                style={{color: 'blue', cursor: 'pointer'}}
                                 onClick={handleShowLogin}
                             >
                 Login
