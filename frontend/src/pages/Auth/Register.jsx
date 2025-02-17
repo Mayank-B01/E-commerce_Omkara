@@ -12,12 +12,24 @@ const Register = ({ handleShowLogin }) => {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [answer, setAnswer] = useState('');
+
+    const validatePhoneNumber = (number) => /^\d{10}$/.test(number); // Exactly 10 digits
+    const validatePassword = (password) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#%*&$!]).{8,}$/.test(password);
 
     const handlePassCheck = async(e) => {
         e.preventDefault();
+
+        if (!validatePhoneNumber(phone)) {
+            return toast.error("Phone number must be exactly 10 digits.");
+        }
+
+        if (!validatePassword(password)) {
+            return toast.error("Password must contain at least 1 uppercase, 1 lowercase, 1 number, and 1 special character (@,#,%,*,&,$,!).");
+        }
         try{
             if(password === confirmPassword) {
-                const res = await axios.post(`${import.meta.env.VITE_API}/api/v1/auth/register`, {name,email,password,phone});
+                const res = await axios.post(`${import.meta.env.VITE_API}/api/v1/auth/register`, {name,email,password,phone,answer});
                 if (res.data.success) {
                     toast.success(res.data.message);
                     handleShowLogin();
@@ -35,7 +47,7 @@ const Register = ({ handleShowLogin }) => {
         }
     }
     return (
-        <div className="register-container" style={{ minHeight: '80vh' }}>
+        <div className="register-container" style={{ minHeight: '80vh'}}>
             <Row>
                 <Col md={7} className="d-none d-md-block">
                     <img
@@ -120,6 +132,20 @@ const Register = ({ handleShowLogin }) => {
                                 required
                             />
                         </div>
+                        <div className="mb-4">
+                            <label htmlFor="answer" className="form-label">
+                                Security Question
+                            </label>
+                            <input
+                                type="Answer"
+                                value={answer}
+                                onChange={(e) => setAnswer(e.target.value)}
+                                className="form-control"
+                                id="registerAnswer"
+                                placeholder="What is your favorite color?"
+                                required
+                            />
+                        </div>
                         {/* Sign Up Button */}
                         <button type="submit" className="btn w-100 mb-3" style={{backgroundColor: '#74ab6a'}}>
                             Sign Up
@@ -133,13 +159,13 @@ const Register = ({ handleShowLogin }) => {
                         </div>
 
                         {/* Continue with Google Button */}
-                        <button type="button" className="btn btn-danger w-100 mb-3">
+                        <button type="button" className="btn btn-danger w-100 mb-2">
                             <FaGoogle className="me-2"/>
                             Continue With Google
                         </button>
 
                         {/* Login Link */}
-                        <div className="text-center">
+                        <div className="text-center mb-2">
                             Already have an account?{' '}
                             <span
                                 style={{color: 'blue', cursor: 'pointer'}}

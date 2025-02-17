@@ -1,30 +1,24 @@
 import React,{useState} from 'react';
 import {Col, Row} from "react-bootstrap";
 import {toast} from "react-toastify";
-import {useAuth} from "../../context/auth.jsx";
 import axios from "axios";
 
-const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthModal}) => {
+const ForgotPassword = ({ handleShowLogin}) =>{
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [auth,setAuth] = useAuth();
+    const [newPassword, setNewPassword] = useState('');
+    const [answer, setAnswer] = useState('');
 
     const handleSubmit = async (e) =>{
         e.preventDefault();
         try{
-            const res = await axios.post(`${import.meta.env.VITE_API}/api/v1/auth/login`,{
+            const res = await axios.post(`${import.meta.env.VITE_API}/api/v1/auth/forgot-password`,{
                 email,
-                password
+                newPassword,
+                answer
             });
             if (res.data.success) {
                 toast.success(res.data.message);
-                setAuth({
-                    ...auth,
-                    user:res.data.user,
-                    token:res.data.token
-                })
-                localStorage.setItem('auth', JSON.stringify(res.data))
-                handleCloseAuthModal();
+                handleShowLogin();
             }
             else{
                 toast.error(res.data.message);
@@ -32,11 +26,11 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
         }
         catch (e){
             console.log(e);
-            toast.error(e.message);
+            toast.error(e.response.data.message);
         }
     }
-    return (
-        <div className="login-container" style={{minHeight: '50vh'}}>
+    return(
+        <div className="forgot-pass-container" style={{minHeight: '50vh'}}>
             <Row>
                 <Col md={7} className="d-none d-md-block">
                     <img
@@ -64,37 +58,40 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
                         </div>
                         <div className="mb-2">
                             <label htmlFor="registerPassword" className="form-label">
-                                Password
+                                Security Question
                             </label>
                             <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                type="String"
+                                value={answer}
+                                onChange={(e) => setAnswer(e.target.value)}
                                 className="form-control"
-                                id="registerPassword"
-                                placeholder="Enter Password"
+                                id="Answer"
+                                placeholder="What is your favorite color?"
                                 required
                             />
                         </div>
-                        <div onClick={handleShowForgotPassword} className="text-decoration-underline mb-3" style={{ cursor: "pointer" }}>
-                            Forgot Password?
+                        <div className="mb-2">
+                            <label htmlFor="registerNewPassword" className="form-label">
+                                New Password
+                            </label>
+                            <input
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                className="form-control"
+                                id="NewPassword"
+                                placeholder="Enter New Password"
+                                required
+                            />
                         </div>
                         <button type="submit" className="btn w-100 mb-3" style={{backgroundColor: '#74ab6a'}}>
-                            Login
+                            Reset Password
                         </button>
-
-                        <div className="text-center">
-                            Don't have an account?{' '}
-                            <span
-                                style={{color: 'blue', cursor: 'pointer'}}
-                                onClick={handleShowRegister}
-                            >SignUp</span>
-                        </div>
                     </form>
                 </Col>
             </Row>
         </div>
-    );
-};
+    )
+}
 
-export default Login;
+export default ForgotPassword;

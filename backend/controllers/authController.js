@@ -3,14 +3,31 @@ const {hashPassword} = require("../utils/authHelp.js");
 const JWT = require('jsonwebtoken');
 const {comparePassword} = require("../utils/authHelp");
 
+const validatePhoneNumber = (number) => /^\d{10}$/.test(number);
+const validatePassword = (password) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#%*&$!]).{8,}$/.test(password);
+
 const registerController = async (req, res) => {
     try{
-        const {name,email, password, phone} = req.body;
+        const {name,email, password, phone, answer} = req.body;
         //validation
-        if(!name || !email || !password || !phone){
+        if(!name || !email || !password || !phone || !answer){
             return res.send({
                 success: false,
                 message: 'Please provide all the required fields'
+            });
+        }
+
+        if (!validatePhoneNumber(phone)) {
+            return res.status(400).send({
+                success: false,
+                message: "Phone number must be exactly 10 digits."
+            });
+        }
+
+        if (!validatePassword(password)) {
+            return res.status(400).send({
+                success: false,
+                message: "Password must contain at least 1 uppercase, 1 lowercase, 1 number, and 1 special character (@,#,%,*,&,$,!)."
             });
         }
 
@@ -24,7 +41,7 @@ const registerController = async (req, res) => {
         }
 
         const hashedPassword = await hashPassword(password);
-        const user = await new userModel({name,email, password:hashedPassword, phone:phone.trim()}).save();
+        const user = await new userModel({name,email, password:hashedPassword, phone:phone.trim(), answer}).save();
         res.status(201).send({
             success: true,
             message: 'User created successfully',
@@ -52,6 +69,7 @@ const loginController = async (req, res) => {
 
         //check user
         const user = await userModel.findOne({email}, null, null);
+        user.role = res.body;
         if(!user){
             return res.status(404).send({
                 success: false,
@@ -91,6 +109,45 @@ const loginController = async (req, res) => {
     }
 }
 
+const forgotPassController = async(req, res) =>{
+    try{
+        const {email, answer, newPassword} = req.body;
+        if(!email){
+            res.status(400).send({message:"Email is required"});
+        }
+        if(!answer){
+            res.status(400).send({message:"Answer is required"});
+        }
+        if(!newPassword){
+            res.status(400).send({message:"Password is required"});
+        }
+
+        //checking
+        const user = await userModel.findOne({email, answer}, null, null)
+        if(!user){
+            return res.status(404).send({
+                success:false,
+                message:"Wrong email or answer"
+            })
+        }
+
+        const hashed = await hashPassword(newPassword);
+        await userModel.findByIdAndUpdate(user._id, {password:hashed},null)
+        res.status(200).send({
+            success:true,
+            message:"Password Reset Successfully!"
+            }
+        );
+    }catch (e) {
+        console.log(e);
+        res.status(500).send({
+            success:false,
+            message:"Something went wrong",
+            e
+        })
+    }
+}
+
 const testController =  (res,req) => {
     try{
         res.send("Protected route");
@@ -100,4 +157,4 @@ const testController =  (res,req) => {
     }
 }
 
-module.exports = {registerController, loginController, testController};
+module.exports = {registerController, loginController, testController, forgotPassController};

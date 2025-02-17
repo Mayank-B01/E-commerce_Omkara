@@ -13,6 +13,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import Dashboard from "./pages/user/Dashboard.jsx";
 import PrivateRoute from "./components/routes/Private.jsx";
+import ForgotPassword from "./pages/Auth/ForgotPassword.jsx";
+import AdminRoute from "./components/routes/Admin.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 
 function App() {
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -28,6 +31,11 @@ function App() {
         setShowAuthModal(true);
     };
 
+    const handleForgotPass = () => {
+        setModalContent('forgot-password');
+        setShowAuthModal(true);
+    }
+
 
     const handleCloseAuthModal = () => setShowAuthModal(false);
   return (
@@ -39,7 +47,10 @@ function App() {
            <Route path ='/contact' element={<Contact />} />
            <Route path ='/policy' element={<Policy />}/>
            <Route path ='/dashboard' element={<PrivateRoute />}>
-               <Route path ='' element={<Dashboard />} />
+               <Route path ='user' element={<Dashboard />} />
+           </Route>
+           <Route path ='/dashboard' element={<AdminRoute />}>
+               <Route path ='admin' element={<AdminDashboard />} />
            </Route>
            <Route path ='*' element={<PagenotFound />}/>
        </Routes>
@@ -48,13 +59,17 @@ function App() {
         size="lg"
         dialogClassName="auth-modal">
             <Modal.Header closeButton>
-                <Modal.Title>{modalContent === 'register' ? 'Sign Up' : 'Login'}</Modal.Title>
+                <Modal.Title>
+                    {modalContent === "register" ? "Sign Up" : modalContent === "login" ? "Login" : "Forgot Password"}
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body className="p-0">
-                {modalContent === 'register' ? (
+                {modalContent === "register" ? (
                     <Register handleShowLogin={handleShowLogin} />
+                ) : modalContent === "login" ? (
+                    <Login handleShowRegister={handleShowRegister} handleShowForgotPassword={handleForgotPass} handleCloseAuthModal={handleCloseAuthModal} />
                 ) : (
-                    <Login handleShowRegister={handleShowRegister} handleCloseAuthModel={handleCloseAuthModal}/>
+                    <ForgotPassword handleShowLogin={handleShowLogin} />
                 )}
             </Modal.Body>
         </Modal>

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {NavLink, Link, useNavigate} from "react-router-dom";
+import {NavLink, Link, } from "react-router-dom";
 import { MdOutlineShoppingCart, MdAccountCircle } from "react-icons/md";
 import {useAuth} from "../../context/auth.jsx";
 import {toast} from "react-toastify";
@@ -7,7 +7,6 @@ import {toast} from "react-toastify";
 const Header = ({handleShowAuthModal}) => {
     const [auth, setAuth] = useAuth();
     const [dropdownOpen, setDropdownOPen] = useState(false);
-    const navigate = useNavigate();
 
     const handleLogout = () =>{
         setAuth({
@@ -55,14 +54,18 @@ const Header = ({handleShowAuthModal}) => {
                                     </li>
                                 </>) : (<>
                                     <li className="nav-item">
-                                       <span className="nav-link align-content-center"
+                                       <span className="nav-link align-content-center "
                                              style={{cursor:"pointer", position:"relative"}}
                                              onClick={()=> setDropdownOPen(!dropdownOpen)}
-                                             ><MdAccountCircle size={25} />
+                                             ><MdAccountCircle size={25} /> {auth?.user?.name}
                                        </span>
                                         {dropdownOpen && (
                                             <div className="dropdown-menu show" style={{position:"absolute", right:0}}>
-                                                <NavLink to="/profile" className="dropdown-item" onClick={() => setDropdownOPen(false)}>
+                                                <NavLink
+                                                    to={`/dashboard/${
+                                                        auth?.user?.role === 1 ? 'admin' : 'user'
+                                                    }`}
+                                                    className="dropdown-item" onClick={() => setDropdownOPen(false)}>
                                                     Manage Account
                                                 </NavLink>
                                                 <NavLink to="/" className="dropdown-item" onClick={handleLogout} >Logout</NavLink>
