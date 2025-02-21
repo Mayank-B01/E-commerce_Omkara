@@ -2,39 +2,39 @@ import React from 'react';
 import { NavLink } from "react-router-dom";
 import '../../App.css';
 
-const AdminMenu = () => {
+const UserMenu = () => {
     return (
         <div className="text-center">
             <div className="list-group">
-                <h4>Admin Panel</h4>
+                <h4>Profile Details</h4>
                 <NavLink
-                    to="/dashboard/admin"
+                    to="/dashboard/user"
                     end
                     className={({ isActive }) => `list-group-item ${isActive ? "active-custom" : ""}`}
                 >
                     Dashboard
                 </NavLink>
                 <NavLink
-                    to="/dashboard/admin/users"
+                    to="/dashboard/user/order"
                     className={({ isActive }) => `list-group-item ${isActive ? "active-custom" : ""}`}
                 >
-                    Users
+                    Order History
                 </NavLink>
                 <NavLink
-                    to="/dashboard/admin/products"
+                    to="/dashboard/user/address"
                     className={({ isActive }) => `list-group-item ${isActive ? "active-custom" : ""}`}
                 >
-                    Products
+                    Address
                 </NavLink>
                 <NavLink
-                    to="/dashboard/admin/orders"
+                    to="/dashboard/user/account"
                     className={({ isActive }) => `list-group-item ${isActive ? "active-custom" : ""}`}
                 >
-                    Orders
+                    Account Info
                 </NavLink>
             </div>
         </div>
     );
 };
 
-export default AdminMenu;
+export default UserMenu;

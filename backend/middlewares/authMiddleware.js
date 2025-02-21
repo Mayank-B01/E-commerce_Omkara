@@ -15,7 +15,7 @@ const userModel = require('../models/userModel.js');
 // }
 const requireSignIn = async (req, res, next) => {
     try {
-        const token = req.headers.authorization?.split(" ")[1]; // Extract token after "Bearer "
+        const token = req.headers.authorization?.split(" ")[1];
         if (!token) {
             return res.status(401).json({ success: false, message: "Token missing" });
         }

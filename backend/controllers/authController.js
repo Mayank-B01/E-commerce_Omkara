@@ -95,6 +95,7 @@ const loginController = async (req, res) => {
                 phone:user.phone,
                 address:user.address,
                 role:user.role,
+                createdAt: user.createdAt.toISOString().split('T')[0],
             },
             token,
         })

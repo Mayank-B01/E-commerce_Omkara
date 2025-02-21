@@ -13,3 +13,17 @@
 .auth-modal .modal-body {
     padding: 2rem;
 }
+
+
+.active-custom {
+    background-color: #74ab6a !important; /* Custom background color */
+    color: black !important; /* Custom text color */
+    font-weight: bold;
+}
+
+/* Remove the default Bootstrap active styling */
+.list-group-item.active {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+

@@ -16,6 +16,12 @@ import PrivateRoute from "./components/routes/Private.jsx";
 import ForgotPassword from "./pages/Auth/ForgotPassword.jsx";
 import AdminRoute from "./components/routes/Admin.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
+import UserPage from "./pages/admin/UserPage.jsx";
+import ProductPage from "./pages/admin/ProductPage.jsx";
+import OrderPage from "./pages/admin/OrderPage.jsx";
+import UserOrder from "./pages/user/UserOrder.jsx";
+import Address from "./pages/user/Address.jsx";
+import Profile from "./pages/user/Profile.jsx";
 
 function App() {
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -48,9 +54,16 @@ function App() {
            <Route path ='/policy' element={<Policy />}/>
            <Route path ='/dashboard' element={<PrivateRoute />}>
                <Route path ='user' element={<Dashboard />} />
+               <Route path ='user/order' element={<UserOrder />} />
+               <Route path ='user/address' element={<Address />} />
+               <Route path ='user/account' element={<Profile />} />
+
            </Route>
            <Route path ='/dashboard' element={<AdminRoute />}>
                <Route path ='admin' element={<AdminDashboard />} />
+               <Route path ='admin/users' element={<UserPage />} />
+               <Route path ='admin/products' element={<ProductPage />} />
+               <Route path ='admin/orders' element={<OrderPage />} />
            </Route>
            <Route path ='*' element={<PagenotFound />}/>
        </Routes>
