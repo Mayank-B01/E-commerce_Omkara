@@ -1,6 +1,7 @@
 const express = require('express');
 const { registerController,loginController, testController, forgotPassController } = require('../controllers/authController.js');
 const {requireSignIn, isAdmin} = require('../middlewares/authMiddleware.js');
+const {userCount} = require("../controllers/authController");
 const router = express.Router();
 
 // Register route
@@ -24,5 +25,9 @@ router.get('/user-auth', requireSignIn, (req, res) =>{
 router.get('/admin-auth', requireSignIn, isAdmin, (req, res) =>{
     res.status(200).send({ok:true});
 })
+
+//get user count
+router.get('/count', requireSignIn, isAdmin, userCount);
+
 
 module.exports = router;

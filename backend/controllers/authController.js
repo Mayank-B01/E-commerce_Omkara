@@ -69,7 +69,6 @@ const loginController = async (req, res) => {
 
         //check user
         const user = await userModel.findOne({email}, null, null);
-        user.role = res.body;
         if(!user){
             return res.status(404).send({
                 success: false,
@@ -86,7 +85,7 @@ const loginController = async (req, res) => {
             })
         }
         //token
-        const token = await JWT.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '7d'});
+        const token = await JWT.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '5h'});
         res.status(200).send({
             success: true,
             message: "Logged in successfully",
@@ -106,6 +105,16 @@ const loginController = async (req, res) => {
             message: "Error logging in",
             err
         })
+    }
+}
+
+const userCount = async(req, res) =>{
+    try{
+        const count = await userModel.countDocuments({role:0});
+        res.status(200).json({count});
+    }catch (error){
+        console.log('Error fetching user count:', error);
+        res.status(500).json({error:'Failed to fetch user count'});
     }
 }
 
@@ -157,4 +166,4 @@ const testController =  (res,req) => {
     }
 }
 
-module.exports = {registerController, loginController, testController, forgotPassController};
+module.exports = {registerController, loginController, testController, forgotPassController, userCount};

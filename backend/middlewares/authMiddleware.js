@@ -31,16 +31,18 @@ const requireSignIn = async (req, res, next) => {
 //admin access
 const isAdmin = async (req, res, next) => {
     try {
+        console.log(req.headers.authorization);
         console.log("Decoded User from Token:", req.user); // Check if req.user exists
-
-        if (!req.user?._id) {
+        console.log("User role", req.user.role);
+        console.log("User id", req.user.id);
+        if (!req.user?.id) {
             return res.status(401).json({
                 success: false,
                 message: "User ID not found in token",
             });
         }
 
-        const user = await userModel.findById(req.user._id);
+        const user = await userModel.findById(req.user.id);
         console.log("User Found in DB:", user); // Check if user is found
 
         if (!user) {
