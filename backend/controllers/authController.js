@@ -1,7 +1,6 @@
 const userModel = require('../models/userModel');
-const {hashPassword} = require("../utils/authHelp.js");
+const {hashPassword, comparePassword} = require("../utils/authHelp.js");
 const JWT = require('jsonwebtoken');
-const {comparePassword} = require("../utils/authHelp");
 
 const validatePhoneNumber = (number) => /^\d{10}$/.test(number);
 const validatePassword = (password) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#%*&$!]).{8,}$/.test(password);
