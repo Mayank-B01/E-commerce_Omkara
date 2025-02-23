@@ -96,7 +96,7 @@ const singleCategoryController = async (req, res) => {
 const deleteCategoryController = async (req, res) => {
     try {
         const {id} = req.params;
-        await categoryModel.findByIdAndDelete(id);
+        await categoryModel.findByIdAndDelete(id, null);
         res.status(200).send({
             success:true,
             message:"Category deleted successfully",

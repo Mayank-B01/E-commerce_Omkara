@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const connectDB = require('./database/config');
 const authRoute = require('./routes/authRoute');
 const categoryRoute = require('./routes/categoryRoute');
+const productRoute = require('./routes/productRoute')
 const cors = require('cors');
 
 //configuring environment
@@ -18,6 +19,7 @@ connectDB()
         app.use(morgan('dev'));
         app.use('/api/v1/auth', authRoute);
         app.use('/api/v1/category', categoryRoute);
+        app.use('/api/v1/product', productRoute);
 
         app.get('/', (req, res) => {
             res.send(`<h1>Welcome to Omkara</h1>`);
