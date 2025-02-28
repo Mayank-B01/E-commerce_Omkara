@@ -22,6 +22,7 @@ import OrderPage from "./pages/admin/OrderPage.jsx";
 import UserOrder from "./pages/user/UserOrder.jsx";
 import Address from "./pages/user/Address.jsx";
 import Profile from "./pages/user/Profile.jsx";
+import CategoryPage from "./pages/admin/CategoryPage.jsx";
 
 function App() {
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -63,6 +64,7 @@ function App() {
                <Route path ='admin' element={<AdminDashboard />} />
                <Route path ='admin/users' element={<UserPage />} />
                <Route path ='admin/products' element={<ProductPage />} />
+               <Route path ='admin/category' element={<CategoryPage />} />
                <Route path ='admin/orders' element={<OrderPage />} />
            </Route>
            <Route path ='*' element={<PagenotFound />}/>

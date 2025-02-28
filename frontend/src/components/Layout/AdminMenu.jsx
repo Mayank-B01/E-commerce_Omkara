@@ -21,6 +21,12 @@ const AdminMenu = () => {
                     Users
                 </NavLink>
                 <NavLink
+                    to="/dashboard/admin/category"
+                    className={({ isActive }) => `list-group-item ${isActive ? "active-custom" : ""}`}
+                >
+                    Categories
+                </NavLink>
+                <NavLink
                     to="/dashboard/admin/products"
                     className={({ isActive }) => `list-group-item ${isActive ? "active-custom" : ""}`}
                 >

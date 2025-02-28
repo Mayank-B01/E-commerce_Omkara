@@ -67,7 +67,7 @@ const allCategoryController = async (req, res) => {
         })
     }catch (error){
         console.log(error);
-        res.stat(500).send({
+        res.status(500).send({
             success:false,
             error,
             message:"Error getting all categories"

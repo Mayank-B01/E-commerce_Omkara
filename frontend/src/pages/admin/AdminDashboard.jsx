@@ -31,16 +31,16 @@ const AdminDashboard =() => {
                     <div className='card mt-5 w-75'>
                         <div className='data'>
                             <div  className="d-flex justify-content-between align-items-center mb-3">
-                                <h5>User Count = {userCount !== null ? userCount : "Loading...."} </h5>
-                                <NavLink className='btn btn-outline-dark' to='/dashboard/admin/users'> View Users</NavLink>
+                                <h5>Users Count = {userCount !== null ? userCount : "Loading...."} </h5>
+                                <NavLink className='btn btn-outline-dark w-25' to='/dashboard/admin/users'> View Users</NavLink>
                             </div>
                             <div  className="d-flex justify-content-between align-items-center mb-3">
                                 <h5>Products Count = 5</h5>
-                                <NavLink className='btn btn-outline-dark' to='/dashboard/admin/products'> View Products</NavLink>
+                                <NavLink className='btn btn-outline-dark w-25' to='/dashboard/admin/products'> View Products</NavLink>
                             </div>
                             <div  className="d-flex justify-content-between align-items-center mb-3">
                                 <h5>Active Orders = 5</h5>
-                                <NavLink  className='btn btn-outline-dark' to='/dashboard/admin/orders' > View Orders</NavLink>
+                                <NavLink  className='btn btn-outline-dark w-25' to='/dashboard/admin/orders' > View Orders</NavLink>
                             </div>
                         </div>
                     </div>
