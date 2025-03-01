@@ -32,8 +32,8 @@ const CategoryPage = () => {
     const getAllCategory = async () =>{
         try{
             const {data} = await axios.get(`${import.meta.env.VITE_API}/api/v1/category/allCategory`);
-            if(data.success){
-                setCategories(data.category);
+            if(data?.success){
+                setCategories(data?.category);
             }
         }catch (error){
             console.log(error);
