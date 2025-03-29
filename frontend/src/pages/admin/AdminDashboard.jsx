@@ -7,6 +7,7 @@ import {NavLink} from "react-router-dom";
 const AdminDashboard =() => {
     const [auth] = useAuth();
     const [userCount, setUserCount] = useState(null);
+    const [productCount, setProductCount] = useState(null);
     console.log(auth);
     console.log("User name:", auth?.user?.name);
     useEffect( () => {
@@ -17,6 +18,14 @@ const AdminDashboard =() => {
             setUserCount(res.data.count);
         }
         countcheck();
+
+        const productCount = async() => {
+            const res = await axios.get((`${import.meta.env.VITE_API}/api/v1/auth/productcount`));
+            console.log(res);
+            setProductCount(res.data.count);
+        }
+        productCount();
+
     }, []);
     return(
         <div className="container-fluid m-3 p-3">
@@ -35,7 +44,7 @@ const AdminDashboard =() => {
                                 <NavLink className='btn btn-outline-dark w-25' to='/dashboard/admin/users'> View Users</NavLink>
                             </div>
                             <div  className="d-flex justify-content-between align-items-center mb-3">
-                                <h5>Products Count = 5</h5>
+                                <h5>Products Count = {productCount !== null ? productCount: "Loading..."}</h5>
                                 <NavLink className='btn btn-outline-dark w-25' to='/dashboard/admin/products'> View Products</NavLink>
                             </div>
                             <div  className="d-flex justify-content-between align-items-center mb-3">

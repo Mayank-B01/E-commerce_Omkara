@@ -1,4 +1,5 @@
 const userModel = require('../models/userModel');
+const productModel = require('../models/productModel');
 const {hashPassword, comparePassword} = require("../utils/authHelp.js");
 const JWT = require('jsonwebtoken');
 
@@ -118,6 +119,16 @@ const userCount = async(req, res) =>{
     }
 }
 
+const productCount = async(req, res) =>{
+    try{
+        const count = await productModel.countDocuments();
+        res.status(200).json({count});
+    }catch (error){
+        console.log('Error fetching product count:', error);
+        res.status(500).json({error:'Failed to fetch user count'});
+    }
+}
+
 const forgotPassController = async(req, res) =>{
     try{
         const {email, answer, newPassword} = req.body;
@@ -166,4 +177,4 @@ const testController =  (res,req) => {
     }
 }
 
-module.exports = {registerController, loginController, testController, forgotPassController, userCount};
+module.exports = {registerController, loginController, testController, forgotPassController, userCount, productCount};

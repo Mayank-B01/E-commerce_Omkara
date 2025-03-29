@@ -10,6 +10,7 @@ import Register from "./pages/Auth/Register.jsx";
 import Login from "./pages/Auth/Login.jsx";
 import Header from "./components/Layout/Header.jsx";
 import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 import './App.css';
 import Dashboard from "./pages/user/Dashboard.jsx";
 import PrivateRoute from "./components/routes/Private.jsx";
@@ -48,6 +49,17 @@ function App() {
   return (
     <>
         <Header handleShowAuthModal={handleShowRegister} />
+        <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+        />
        <Routes>
            <Route path ='/' element={<Homepage />} />
            <Route path ='/about' element={<About />} />

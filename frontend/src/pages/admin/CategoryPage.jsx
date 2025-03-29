@@ -18,7 +18,8 @@ const CategoryPage = () => {
         try{
             const {data} =await axios.post(`${import.meta.env.VITE_API}/api/v1/category/create-category`, {name});
             if(data?.success){
-                toast.success(`${data.name} added successfully.`)
+                setName("");
+                toast.success(`${name} added successfully.`)
                 getAllCategory();
             }else{
                 toast.error(data.message);
