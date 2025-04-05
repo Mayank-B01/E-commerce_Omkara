@@ -1,0 +1,139 @@
+.about-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Breadcrumb Styles */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    color: #666;
+}
+
+.breadcrumb a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb .separator {
+    font-size: 0.8rem;
+    color: black !important;
+    border: none !important;
+    background: none !important;
+}
+
+.breadcrumb .current {
+    color: #666;
+}
+
+/* Main About Content */
+.about-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 4rem;
+    align-items: center;
+}
+
+.about-text h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.about-logo {
+    text-align: center;
+}
+
+.about-logo img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.about-logo .tagline {
+    color: #4CAF50;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+/* Founder Section */
+.founder-section {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.founder-section h2 {
+    font-size: 2rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.founder-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.founder-image {
+    text-align: center;
+}
+
+.founder-image img {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.founder-message {
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.founder-message p {
+    font-size: 1.2rem;
+    color: #666;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .about-content,
+    .founder-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .about-text h1 {
+        font-size: 2rem;
+    }
+
+    .founder-image img {
+        width: 250px;
+        height: 250px;
+    }
+
+    .founder-message {
+        padding: 1.5rem;
+    }
+} 

@@ -24,6 +24,7 @@ import UserOrder from "./pages/user/UserOrder.jsx";
 import Address from "./pages/user/Address.jsx";
 import Profile from "./pages/user/Profile.jsx";
 import CategoryPage from "./pages/admin/CategoryPage.jsx";
+import Category from "./pages/Category.jsx";
 
 function App() {
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -65,6 +66,7 @@ function App() {
            <Route path ='/about' element={<About />} />
            <Route path ='/contact' element={<Contact />} />
            <Route path ='/policy' element={<Policy />}/>
+           <Route path ='/category' element={<Category />}/>
            <Route path ='/dashboard' element={<PrivateRoute />}>
                <Route path ='user' element={<Dashboard />} />
                <Route path ='user/order' element={<UserOrder />} />

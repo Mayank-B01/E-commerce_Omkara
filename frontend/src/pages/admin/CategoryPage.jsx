@@ -106,14 +106,14 @@ const CategoryPage = () => {
                                             <tr>
                                                 <td key ={c._id}>{c.name}</td>
                                                 <td>
-                                                    <button className='btn btn-primary ms-2' onClick={() => {
+                                                    <button className='btn btn-outline-primary ms-2' onClick={() => {
                                                             setVisible(true);
                                                             setUpdatedName(c.name);
                                                             setSelected(c)
                                                         }
                                                     }
                                                     >Edit</button>
-                                                    <button className='btn btn-danger ms-2' onClick={() =>{submitDelete(c._id)}}>Delete</button>
+                                                    <button className='btn btn-outline-danger ms-2' onClick={() =>{submitDelete(c._id)}}>Delete</button>
                                                 </td>
                                             </tr>
                                         </>
