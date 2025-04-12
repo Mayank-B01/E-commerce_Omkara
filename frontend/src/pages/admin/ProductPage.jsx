@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import AdminMenu from "../../components/Layout/AdminMenu.jsx";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Select, Table, Space, Modal, Button } from "antd";
+import { Select, Table, Space, Modal, Button, Checkbox } from "antd";
 import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
+
+// Define size options
+const sizeOptions = ['S', 'M', 'L', 'XL', 'XXL'];
 
 const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
     const [categories, setCategories] = useState([]);
@@ -17,6 +20,7 @@ const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
     const [category, setCategory] = useState();
     const [quantity, setQuantity] = useState();
     const [shipping, setShipping] = useState("");
+    const [sizes, setSizes] = useState([]);
 
     useEffect(() => {
         const getCategories = async () => {
@@ -41,6 +45,7 @@ const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
             setQuantity(initialData.quantity);
             setCategory(initialData.category);
             setShipping(initialData.shipping ? "1" : "0");
+            setSizes(initialData.sizes || []);
             setExistingPhoto(
                 `${import.meta.env.VITE_API}/api/v1/product/product-photo/${initialData._id}`
             );
@@ -58,6 +63,7 @@ const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
         setShipping(undefined);
         setPhotoFile(null);
         setExistingPhoto(null);
+        setSizes([]);
     };
 
     const handleSubmit = async (e) => {
@@ -71,6 +77,7 @@ const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
             if (photoFile) productData.append("photo", photoFile);
             productData.append("category", category);
             productData.append("shipping", shipping === "1");
+            productData.append("sizes", JSON.stringify(sizes));
 
             const url = initialData
                 ? `${import.meta.env.VITE_API}/api/v1/product/update-product/${initialData._id}`
@@ -174,6 +181,18 @@ const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
                         onChange={(e) => setQuantity(e.target.value)}
                     />
                 </div>
+
+                {/* Sizes Selection */}
+                <div className="mb-3">
+                    <label>Available Sizes</label>
+                    <Checkbox.Group
+                        options={sizeOptions}
+                        value={sizes}
+                        onChange={(checkedValues) => setSizes(checkedValues)}
+                        className="w-100"
+                    />
+                </div>
+
                 <label>Shipping</label>
                 <Select
                     className="w-100 mb-3 "

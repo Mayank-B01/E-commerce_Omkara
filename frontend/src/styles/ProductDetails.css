@@ -1,0 +1,109 @@
+/* Add styles for ProductDetails.jsx here */
+
+.product-details-container {
+    /* Add overall container styles */
+}
+
+.main-product-image {
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 4px;
+    max-height: 500px; 
+    width: auto;
+    object-fit: contain;
+}
+
+.product-thumbnails {
+    display: flex;
+    justify-content: center;
+}
+
+.product-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.product-thumbnail:hover,
+.product-thumbnail.active { /* Add active class via JS if implementing thumbnail switching */
+    opacity: 1;
+    border-color: #333;
+}
+
+.product-info {
+    /* Styles for the right-side details column */
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 0.5rem; 
+}
+
+.size-btn {
+    min-width: 40px; /* Ensure buttons have minimum width */
+    margin-bottom: 5px; /* Spacing for buttons */
+}
+
+.color-swatch {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px; /* Slightly rounded */
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.color-swatch:hover {
+     transform: scale(1.1);
+}
+
+.quantity-selector {
+   /* Styles for quantity section */
+}
+
+.quantity-btn {
+    width: 30px;
+    height: 30px;
+    line-height: 1;
+    padding: 0;
+    font-size: 1rem;
+}
+
+.quantity-display {
+    display: inline-block;
+    min-width: 40px;
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.price-display {
+    color: #B12704; /* Example price color */
+    font-weight: bold;
+}
+
+.action-buttons .btn {
+    padding: 0.75rem 1rem; /* Larger buttons */
+    font-size: 1rem;
+}
+
+.recommended-section .card {
+    border: 1px solid #eee;
+    transition: box-shadow 0.3s ease;
+}
+
+.recommended-section .card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.recommended-section .section-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+} 

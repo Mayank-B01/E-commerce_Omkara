@@ -5,7 +5,10 @@ const {addProductController,
     singleProductController,
     photoController,
     deleteProductController,
-    updateProductController} = require("../controllers/productController");
+    updateProductController,
+    productFiltersController,
+    relatedProductController,
+    productCategoryNameSearchController} = require("../controllers/productController");
 const formidable = require('express-formidable');
 
 const router = express.Router();
@@ -27,5 +30,14 @@ router.delete('/delete-product/:pid', requireSignIn, isAdmin, deleteProductContr
 
 //update-product
 router.put('/update-product/:pid', requireSignIn, isAdmin, formidable(), updateProductController);
+
+// Filter products
+router.post('/product-filters', productFiltersController);
+
+// Related products
+router.get('/related-product/:pid/:cid', relatedProductController);
+
+// Product Category Name Search
+router.post('/product-category-name-search', productCategoryNameSearchController);
 
 module.exports = router;

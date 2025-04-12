@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Layout from "../components/Layout/Layout.jsx";
 import { useAuth } from "../context/auth.jsx";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Homepage.css';
 import axios from 'axios';
 import menCategory from '../assets/men-category.png';
 import womenCategory from '../assets/women-category.png';
 import accessoriesCategory from '../assets/accessories-category.jpg';
+import { toast } from 'react-toastify';
 
 const Homepage = () => {
     const [auth] = useAuth();
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [trendingProducts, setTrendingProducts] = useState([]);
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -93,18 +95,24 @@ const Homepage = () => {
 
             {/* Categories Grid */}
             <section className="categories-grid">
-                <div className="category-item">
-                    <img src={menCategory} alt="Men's Fashion" />
-                    <h3>Men's Fashion</h3>
-                </div>
-                <div className="category-item">
-                    <img src={womenCategory} alt="Women's Fashion" />
-                    <h3>Women's Fashion</h3>
-                </div>
-                <div className="category-item">
-                    <img src={accessoriesCategory} alt="Accessories" />
-                    <h3>Accessories</h3>
-                </div>
+                <Link to="/category?searchName=Men" className="category-item-link">
+                    <div className="category-item">
+                        <img src={menCategory} alt="Men's Fashion" />
+                        <h3>Men's Fashion</h3>
+                    </div>
+                </Link>
+                <Link to="/category?searchName=Women" className="category-item-link">
+                    <div className="category-item">
+                        <img src={womenCategory} alt="Women's Fashion" />
+                        <h3>Women's Fashion</h3>
+                    </div>
+                </Link>
+                <Link to="/category?searchName=Accessories" className="category-item-link">
+                    <div className="category-item">
+                        <img src={accessoriesCategory} alt="Accessories" />
+                        <h3>Accessories</h3>
+                    </div>
+                </Link>
             </section>
 
             {/* Trending Section */}
@@ -122,7 +130,20 @@ const Homepage = () => {
                             />
                             <h3>{product.name}</h3>
                             <p className="price">Rs. {product.price}</p>
-                            <Link to={`/product/${product.slug}`} className="shop-button">Shop</Link>
+                            <button
+                                className='btn btn-sm btn-outline-dark ms-1'
+                                onClick={() => navigate(`/product/${product.slug}`)}
+                            >
+                                Shop
+                            </button>
+                            <button
+                                className='btn btn-sm btn-dark ms-1'
+                                onClick={() => {
+                                    toast.success('Item added to cart!');
+                                }}
+                            >
+                                Add to Cart <i className="bi bi-cart-plus-fill"></i>
+                            </button>
                         </div>
                     ))}
                 </div>

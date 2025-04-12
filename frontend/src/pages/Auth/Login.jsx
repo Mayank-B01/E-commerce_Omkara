@@ -24,7 +24,9 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
                     token:res.data.token
                 })
                 localStorage.setItem('auth', JSON.stringify(res.data))
-                handleCloseAuthModal();
+                setTimeout(() => {
+                    handleCloseAuthModal(); 
+                }, 100);
             }
             else{
                 toast.error(res.data.message);

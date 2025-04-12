@@ -11,20 +11,21 @@ import Login from "./pages/Auth/Login.jsx";
 import Header from "./components/Layout/Header.jsx";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import './App.css';
+import './App.css'; // Uncomment App.css
 import Dashboard from "./pages/user/Dashboard.jsx";
 import PrivateRoute from "./components/routes/Private.jsx";
 import ForgotPassword from "./pages/Auth/ForgotPassword.jsx";
 import AdminRoute from "./components/routes/Admin.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import UserPage from "./pages/admin/UserPage.jsx";
-import ProductPage from "./pages/admin/ProductPage.jsx";
+import ProductPage from "./pages/Admin/ProductPage.jsx";
 import OrderPage from "./pages/admin/OrderPage.jsx";
 import UserOrder from "./pages/user/UserOrder.jsx";
 import Address from "./pages/user/Address.jsx";
 import Profile from "./pages/user/Profile.jsx";
-import CategoryPage from "./pages/admin/CategoryPage.jsx";
+import CategoryPage from "./pages/Admin/CategoryPage.jsx";
 import Category from "./pages/Category.jsx";
+import ProductDetails from "./pages/ProductDetails.jsx";
 
 function App() {
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -67,6 +68,7 @@ function App() {
            <Route path ='/contact' element={<Contact />} />
            <Route path ='/policy' element={<Policy />}/>
            <Route path ='/category' element={<Category />}/>
+           <Route path ='/product/:slug' element={<ProductDetails />} />
            <Route path ='/dashboard' element={<PrivateRoute />}>
                <Route path ='user' element={<Dashboard />} />
                <Route path ='user/order' element={<UserOrder />} />

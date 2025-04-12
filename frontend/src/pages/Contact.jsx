@@ -52,11 +52,11 @@ const Contact = () => {
         <Layout title={'Contact Us - Omkara'}>
             <div className="contact-container">
                 {/* Breadcrumb Navigation */}
-                <div className="breadcrumb">
+                {/* <div className="breadcrumb">
                     <Link to="/">Home</Link>
                     <span className="separator">▶</span>
                     <span className="current">Contact</span>
-                </div>
+                </div> */}
 
                 <h1>Contact Us</h1>
 

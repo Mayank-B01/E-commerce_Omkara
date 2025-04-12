@@ -1,28 +1,31 @@
 import React from 'react';
 import Footer from "./Footer.jsx";
 import {Helmet} from "react-helmet";
-import {ToastContainer} from "react-toastify";
 
-const Layout = ({children, title= "Omkara",
-                    description= "Clothing brand e-commerce website",
-                    keywords= "clothing, e-commerce, online shopping, clothing store,"}) => {
-    return(
-            <div>
-                <Helmet>
-                    <meta charSet="utf-8"/>
-                    <meta name="title" content={title}/>
-                    <meta name="description" content={description}/>
-                    <meta name="keywords" content={keywords}/>
-                    <title>{title}</title>
-                </Helmet>
-                <main style={{minHeight: "70vh"}}>
-                    <ToastContainer/>
-                    {children}
-                </main>
-                <Footer/>
-            </div>
+const Layout = ({children, title, description, keywords, author}) => {
+    return (
+        <div>
+            <Helmet>
+                <meta charSet="utf-8" />
+                <meta name="description" content={description} />
+                <meta name="keywords" content={keywords} />
+                <meta name="author" content={author} />
+                <title>{title}</title>
+            </Helmet>
+            {/* <Header/> */}
+            <main style={{minHeight:'80vh'}}>
+                {children}
+            </main>
+            <Footer/>
+        </div>
     );
 };
 
+Layout.defaultProps = {
+    title: "Omkara - shop now",
+    description: "mern stack project",
+    keywords: "mern,react,node,mongodb",
+    author: "Omkara",
+};
 
 export default Layout;

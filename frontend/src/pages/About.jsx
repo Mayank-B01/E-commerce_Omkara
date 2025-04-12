@@ -9,12 +9,12 @@ const About = () => {
     return (
         <Layout title={'About Us - Omkara'}>
             <div className="about-container">
-                {/* Breadcrumb Navigation */}
-                <div className="breadcrumb">
+                {/* Breadcrumb Removed */}
+                {/* <div className="breadcrumb">
                     <Link to="/">Home</Link>
                     <span className="separator">▶</span>
                     <span className="current">About Us</span>
-                </div>
+                </div> */}
 
                 {/* Main About Section */}
                 <div className="about-content">
