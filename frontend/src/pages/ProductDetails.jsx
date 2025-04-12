@@ -3,13 +3,13 @@ import Layout from '../components/Layout/Layout.jsx';
 import axios from 'axios';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-// import { useCart } from "../context/cart.jsx";
+import { useCart } from "../context/cart.jsx";
 import '../styles/ProductDetails.css';
 
 const ProductDetails = () => {
     const params = useParams();
     const navigate = useNavigate();
-    // const [cart, setCart] = useCart();
+    const [cart, setCart] = useCart();
     const [product, setProduct] = useState({});
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [selectedSize, setSelectedSize] = useState(null); // State for selected size
@@ -71,14 +71,11 @@ const ProductDetails = () => {
             toast.error("Please select a size");
             return;
         }
-        const productToAdd = {
-            ...product, // Spread existing product details
-            selectedSize, // Add selected size
-            quantity, // Add selected quantity
-            // Add selected color if implemented
-        };
-        // setCart([...cart, productToAdd]);
-        // localStorage.setItem('cart', JSON.stringify([...cart, productToAdd]));
+        // Simple add - duplicates allowed for now
+        // For more complex logic (checking existing, updating quantity), replace below
+        const updatedCart = [...cart, { ...product, selectedSize, quantity }];
+        setCart(updatedCart);
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
         toast.success('Item added to cart!');
     };
 
@@ -213,9 +210,12 @@ const ProductDetails = () => {
                                         </button>
                                         <button
                                             className='btn btn-sm btn-dark ms-1'
-                                            onClick={() => {
-                                                // setCart([...cart, p]);
-                                                // localStorage.setItem('cart', JSON.stringify([...cart, p]));
+                                            onClick={() => { 
+                                                // Add related product to cart (simple add)
+                                                // Note: This doesn't account for size/quantity selection for related items
+                                                const updatedCart = [...cart, p]; // Add the related product object 'p'
+                                                setCart(updatedCart);
+                                                localStorage.setItem('cart', JSON.stringify(updatedCart));
                                                 toast.success('Item added to cart!');
                                             }}
                                         >

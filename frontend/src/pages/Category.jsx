@@ -4,8 +4,8 @@ import Layout from "../components/Layout/Layout.jsx";
 import {useAuth} from "../context/auth.jsx";
 import axios from 'axios';
 import {Prices} from "../components/Prices.js";
-// import { useCart } from "../context/cart.jsx"; // Import cart context
 import { toast } from 'react-toastify'; // Import toast
+import { useCart } from "../context/cart.jsx"; // Import useCart
 
 // Static sizes for now
 const Sizes = ["S", "M", "L", "XL", "XXL"];
@@ -14,7 +14,7 @@ const Category = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [auth, setAuth] = useAuth();
-    // const [cart, setCart] = useCart(); // Use cart context
+    const [cart, setCart] = useCart(); // Use cart context
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [checked, setChecked] = useState([]);
@@ -299,9 +299,13 @@ const Category = () => {
                                     >
                                         Shop
                                     </button>
-                                    <button 
+                                    <button
                                         className='btn btn-sm btn-dark ms-1'
                                         onClick={() => {
+                                            // Add product to cart (simple add, quantity 1, no size selected here)
+                                            const updatedCart = [...cart, { ...p, quantity: 1 }]; // Add product p with default quantity 1
+                                            setCart(updatedCart);
+                                            localStorage.setItem('cart', JSON.stringify(updatedCart));
                                             toast.success('Item added to cart!');
                                         }}
                                     >

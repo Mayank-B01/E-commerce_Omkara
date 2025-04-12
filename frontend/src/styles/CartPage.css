@@ -1,0 +1,31 @@
+/* Styles for CartPage.jsx */
+
+.cart-page-container {
+    /* Add container styles if needed */
+}
+
+.cart-item-card {
+    background-color: #f8f9fa; /* Light background for item cards */
+}
+
+.cart-item-image {
+    max-height: 120px; /* Limit image height */
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.cart-summary {
+    border-left: 1px solid #eee; /* Separator for summary */
+    padding-left: 2rem;
+}
+
+@media (max-width: 767px) {
+    .cart-summary {
+        border-left: none;
+        border-top: 1px solid #eee;
+        padding-left: 0;
+        padding-top: 1.5rem;
+        margin-top: 1.5rem;
+    }
+} 

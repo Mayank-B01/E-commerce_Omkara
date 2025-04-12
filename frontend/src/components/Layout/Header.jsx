@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from "react-router-dom";
 import { MdOutlineShoppingCart, MdAccountCircle } from "react-icons/md";
 import { useAuth } from "../../context/auth.jsx";
+import { useCart } from "../../context/cart.jsx";
 import { toast } from "react-toastify";
 import axios from 'axios';
 import { NavDropdown } from 'react-bootstrap';
 
 const Header = ({ handleShowAuthModal }) => {
     const [auth, setAuth] = useAuth();
+    const [cart, setCart] = useCart();
     const [dropdownOpen, setDropdownOPen] = useState(false);
     const [categories, setCategories] = useState([]);
 
@@ -32,9 +34,14 @@ const Header = ({ handleShowAuthModal }) => {
             ...auth,
             user: null,
             token: ''
-        })
+        });
         localStorage.removeItem("auth");
-        toast.success("Logged out successful.")
+
+        setCart([]);
+        localStorage.removeItem("cart");
+
+        toast.success("Logged out successfully.");
+        setDropdownOPen(false);
     }
 
     return (
@@ -74,7 +81,22 @@ const Header = ({ handleShowAuthModal }) => {
                         </ul>
                         <ul className="navbar-nav ms-auto mb-2 mb-0">
                             <li className="nav-item">
-                                <NavLink to="/cart" className="nav-link align-content-center"><MdOutlineShoppingCart size={25} /></NavLink>
+                                <NavLink to="/cart" className="nav-link align-content-center" style={{ position: 'relative' }}>
+                                    <MdOutlineShoppingCart size={25} />
+                                    {cart?.length > 0 && (
+                                         <span 
+                                            className="badge rounded-pill bg-danger"
+                                            style={{
+                                                position: 'absolute',
+                                                top: '-5px', 
+                                                right: '-5px',
+                                                fontSize: '0.7em'
+                                            }}
+                                        >
+                                            {cart.length}
+                                        </span>
+                                    )}
+                                </NavLink>
                             </li>
                             {
                                 !auth.user ? (<>

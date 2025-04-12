@@ -1,10 +1,10 @@
-import {Route, Routes} from 'react-router-dom'
+import React, {useState, useEffect} from "react";
+import {Route, Routes, useLocation} from 'react-router-dom'
 import Homepage from "./pages/Homepage.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Policy from "./pages/Policy.jsx";
 import PagenotFound from "./pages/PagenotFound.jsx";
-import {useState} from "react";
 import {Modal} from 'react-bootstrap';
 import Register from "./pages/Auth/Register.jsx";
 import Login from "./pages/Auth/Login.jsx";
@@ -26,10 +26,18 @@ import Profile from "./pages/user/Profile.jsx";
 import CategoryPage from "./pages/Admin/CategoryPage.jsx";
 import Category from "./pages/Category.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
+import CartPage from "./pages/CartPage.jsx";
 
 function App() {
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [modalContent, setModalContent] = useState('register');
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state?.showLogin) {
+            handleShowLogin();
+        }
+    }, [location.state]);
 
     const handleShowRegister = () => {
         setModalContent('register');
@@ -45,7 +53,6 @@ function App() {
         setModalContent('forgot-password');
         setShowAuthModal(true);
     }
-
 
     const handleCloseAuthModal = () => setShowAuthModal(false);
   return (
@@ -69,6 +76,7 @@ function App() {
            <Route path ='/policy' element={<Policy />}/>
            <Route path ='/category' element={<Category />}/>
            <Route path ='/product/:slug' element={<ProductDetails />} />
+           <Route path ='/cart' element={<CartPage />} />
            <Route path ='/dashboard' element={<PrivateRoute />}>
                <Route path ='user' element={<Dashboard />} />
                <Route path ='user/order' element={<UserOrder />} />

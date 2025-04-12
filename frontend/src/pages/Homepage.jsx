@@ -7,11 +7,13 @@ import axios from 'axios';
 import menCategory from '../assets/men-category.png';
 import womenCategory from '../assets/women-category.png';
 import accessoriesCategory from '../assets/accessories-category.jpg';
+import { useCart } from "../context/cart.jsx";
 import { toast } from 'react-toastify';
 
 const Homepage = () => {
     const [auth] = useAuth();
     const navigate = useNavigate();
+    const [cart, setCart] = useCart();
     const [products, setProducts] = useState([]);
     const [trendingProducts, setTrendingProducts] = useState([]);
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -139,6 +141,9 @@ const Homepage = () => {
                             <button
                                 className='btn btn-sm btn-dark ms-1'
                                 onClick={() => {
+                                    const updatedCart = [...cart, { ...product, quantity: 1 }];
+                                    setCart(updatedCart);
+                                    localStorage.setItem('cart', JSON.stringify(updatedCart));
                                     toast.success('Item added to cart!');
                                 }}
                             >
