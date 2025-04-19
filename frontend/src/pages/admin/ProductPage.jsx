@@ -270,22 +270,28 @@ const ProductPage = () => {
         {
             title: "Name",
             dataIndex: "name",
+            key: "name",
         },
         {
             title: "Category",
-            render: (record) => categories.find(c => c._id === record.category)?.name,
+            dataIndex: "category",
+            key: "category",
+            render: (category) => category?.name || 'N/A',
         },
         {
             title: "Price",
             dataIndex: "price",
+            key: "price",
             render: (price) => `Rs. ${price}`,
         },
         {
             title: "Quantity",
             dataIndex: "quantity",
+            key: "quantity",
         },
         {
             title: "Actions",
+            key: "actions",
             render: (_, record) => (
                 <Space>
                     <Button onClick={() => {

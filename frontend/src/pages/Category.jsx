@@ -113,12 +113,12 @@ const Category = () => {
     }, [checked, radio, checkedSizes, sortBy, initialLoadComplete, searchNameFromUrl]);
 
     //get all products
-    const getAllProducts = async () => {
+     const getAllProducts = async () => {
         try {
             const {data} = await axios.get(`${import.meta.env.VITE_API}/api/v1/product/get-product`);
             setProducts(data.products);
         } catch (error) {
-            console.log(error);
+             console.log(error);
             toast.error("Error fetching all products");
         }
     }
@@ -316,7 +316,7 @@ const Category = () => {
                         )) : (
                             <div className="text-center w-100 mt-4">
                                 <h4>No products found matching your criteria.</h4>
-                            </div>
+                        </div>
                         )}
                     </div>
 
@@ -327,7 +327,7 @@ const Category = () => {
                         </button>
                     </div>
                 </div>
-            </div>
+                </div>
         </Layout>
     );
 };

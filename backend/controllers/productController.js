@@ -155,10 +155,18 @@ const getProductController = async (req, res) => {
 
 const singleProductController = async (req, res) => {
     try {
-        const product = await productModel.findOne({slug:req.params.slug}, null, null)
+        const product = await productModel.findOne({slug:req.params.slug})
             .select('-photo')
             .populate('category')
         ;
+        // Explicitly check if product exists
+        if (!product) {
+            return res.status(404).send({
+                success: false,
+                message: "Product not found"
+            });
+        }
+        // If product exists, send success response
         res.status(200).send({
             success:true,
             message:"Product found successfully",
