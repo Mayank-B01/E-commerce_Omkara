@@ -7,6 +7,7 @@ const AuthProvider = ({ children }) => {
         user: null,
         token: "",
     });
+    const [loading, setLoading] = useState(true);
 
     // Update Axios headers when token changes
     useEffect(() => {
@@ -19,18 +20,35 @@ const AuthProvider = ({ children }) => {
 
     // Initialize auth from localStorage on mount
     useEffect(() => {
-        const data = localStorage.getItem("auth");
-        if (data) {
-            const parseData = JSON.parse(data);
-            setAuth({
-                user: parseData.user,
-                token: parseData.token,
-            });
+        let isMounted = true;
+        try {
+            const data = localStorage.getItem("auth");
+            if (data) {
+                const parseData = JSON.parse(data);
+                if (isMounted) {
+                    setAuth({
+                        user: parseData.user,
+                        token: parseData.token,
+                    });
+                }
+            }
+        } catch (error) {
+            console.error("Failed to parse auth data from localStorage:", error);
+            // Optionally clear corrupted data
+            // localStorage.removeItem("auth");
+        } finally {
+            if (isMounted) {
+                setLoading(false);
+            }
         }
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     return (
-        <AuthContext.Provider value={[auth, setAuth]}>
+        <AuthContext.Provider value={[auth, setAuth, loading]}>
             {children}
         </AuthContext.Provider>
     );

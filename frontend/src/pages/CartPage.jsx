@@ -52,20 +52,20 @@ const CartPage = () => {
     };
     
     // Handle Quantity Change (Example - if quantity adjustable in cart)
-    // const handleQuantityChange = (productId, size, newQuantity) => {
-    //     if (newQuantity < 1) return; // Minimum quantity is 1
-    //     try {
-    //         let myCart = [...cart];
-    //         const index = myCart.findIndex(item => item._id === productId && item.selectedSize === size);
-    //         if (index !== -1) {
-    //             myCart[index].quantity = newQuantity;
-    //             setCart(myCart);
-    //             localStorage.setItem('cart', JSON.stringify(myCart));
-    //         }
-    //     } catch (error) {
-    //         console.log("Error updating quantity:", error);
-    //     }
-    // };
+    const handleQuantityChange = (productId, size, newQuantity) => {
+        if (newQuantity < 1) return; // Minimum quantity is 1
+        try {
+            let myCart = [...cart];
+            const index = myCart.findIndex(item => item._id === productId && item.selectedSize === size);
+            if (index !== -1) {
+                myCart[index].quantity = newQuantity;
+                setCart(myCart);
+                localStorage.setItem('cart', JSON.stringify(myCart));
+            }
+        } catch (error) {
+            console.log("Error updating quantity:", error);
+        }
+    };
 
     return (
         <Layout title={"Your Cart - Omkara"}>
@@ -101,11 +101,11 @@ const CartPage = () => {
                                     {/* Display quantity - Adjust if editable */}
                                     <p className="mb-1">Quantity: {p.quantity || 1}</p> 
                                     {/* Quantity Changer - Uncomment and adapt if needed */}
-                                    {/* <div className="d-flex align-items-center mb-2">
+                                    <div className="d-flex align-items-center mb-2">
                                         <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => handleQuantityChange(p._id, p.selectedSize, (p.quantity || 1) - 1)}>-</button>
                                         <span>{p.quantity || 1}</span>
                                         <button className="btn btn-outline-secondary btn-sm ms-2" onClick={() => handleQuantityChange(p._id, p.selectedSize, (p.quantity || 1) + 1)}>+</button>
-                                    </div> */} 
+                                    </div> 
                                     <p className="fw-bold mb-2">Price: Rs {p.price}</p>
                                     <button 
                                         className="btn btn-danger btn-sm" 

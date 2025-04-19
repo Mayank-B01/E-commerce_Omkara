@@ -56,7 +56,7 @@ const Category = () => {
             console.log("Handling searchName:", nameSearch);
             setSearchNameFromUrl(nameSearch); 
             // Clear specific filters when coming from name search link
-            setChecked([]); 
+            setChecked([]); // Reset category filter on name search
             setRadio([]);
             setCheckedSizes([]);
             setSortBy("");
@@ -83,6 +83,16 @@ const Category = () => {
             // Wait for categories to load, which will re-trigger this effect.
              console.log("'cat' param found, but categories not loaded yet. Waiting...");
              // handledByUrl remains false
+        } else if (!categorySlugFromUrl && !nameSearch) {
+            // If NO category or name search param in URL (e.g., navigating to /category)
+            // Clear the category filter explicitly.
+            console.log("No 'cat' or 'searchName' found in URL, clearing category filter.");
+            setChecked([]); 
+            // Resetting other filters might be redundant but safe:
+            setRadio([]); 
+            setCheckedSizes([]);
+            setSortBy("");
+            handledByUrl = true; // Indicate URL (absence of params) was handled
         }
 
         // If URL params didn't dictate the load, let the other effect handle it

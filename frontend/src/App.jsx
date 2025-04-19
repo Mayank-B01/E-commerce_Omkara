@@ -8,7 +8,6 @@ import PagenotFound from "./pages/PagenotFound.jsx";
 import {Modal} from 'react-bootstrap';
 import Register from "./pages/Auth/Register.jsx";
 import Login from "./pages/Auth/Login.jsx";
-import Header from "./components/Layout/Header.jsx";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import './App.css'; // Uncomment App.css
@@ -57,7 +56,6 @@ function App() {
     const handleCloseAuthModal = () => setShowAuthModal(false);
   return (
     <>
-        <Header handleShowAuthModal={handleShowRegister} />
         <ToastContainer
             position="top-right"
             autoClose={3000}
@@ -70,28 +68,28 @@ function App() {
             pauseOnHover
         />
        <Routes>
-           <Route path ='/' element={<Homepage />} />
-           <Route path ='/about' element={<About />} />
-           <Route path ='/contact' element={<Contact />} />
-           <Route path ='/policy' element={<Policy />}/>
-           <Route path ='/category' element={<Category />}/>
-           <Route path ='/product/:slug' element={<ProductDetails />} />
-           <Route path ='/cart' element={<CartPage />} />
+           <Route path ='/' element={<Homepage handleShowAuthModal={handleShowRegister} />} />
+           <Route path ='/about' element={<About handleShowAuthModal={handleShowRegister} />} />
+           <Route path ='/contact' element={<Contact handleShowAuthModal={handleShowRegister} />} />
+           <Route path ='/policy' element={<Policy handleShowAuthModal={handleShowRegister} />}/>
+           <Route path ='/category' element={<Category handleShowAuthModal={handleShowRegister} />}/>
+           <Route path ='/product/:slug' element={<ProductDetails handleShowAuthModal={handleShowRegister} />} />
+           <Route path ='/cart' element={<CartPage handleShowAuthModal={handleShowRegister} />} />
            <Route path ='/dashboard' element={<PrivateRoute />}>
-               <Route path ='user' element={<Dashboard />} />
-               <Route path ='user/order' element={<UserOrder />} />
-               <Route path ='user/address' element={<Address />} />
-               <Route path ='user/account' element={<Profile />} />
+               <Route path ='user' element={<Dashboard handleShowAuthModal={handleShowRegister} />} />
+               <Route path ='user/order' element={<UserOrder handleShowAuthModal={handleShowRegister} />} />
+               <Route path ='user/address' element={<Address handleShowAuthModal={handleShowRegister} />} />
+               <Route path ='user/account' element={<Profile handleShowAuthModal={handleShowRegister} />} />
 
            </Route>
            <Route path ='/dashboard' element={<AdminRoute />}>
-               <Route path ='admin' element={<AdminDashboard />} />
-               <Route path ='admin/users' element={<UserPage />} />
-               <Route path ='admin/products' element={<ProductPage />} />
-               <Route path ='admin/category' element={<CategoryPage />} />
-               <Route path ='admin/orders' element={<OrderPage />} />
+               <Route path ='admin' element={<AdminDashboard handleShowAuthModal={handleShowRegister} />} />
+               <Route path ='admin/users' element={<UserPage handleShowAuthModal={handleShowRegister} />} />
+               <Route path ='admin/products' element={<ProductPage handleShowAuthModal={handleShowRegister} />} />
+               <Route path ='admin/category' element={<CategoryPage handleShowAuthModal={handleShowRegister} />} />
+               <Route path ='admin/orders' element={<OrderPage handleShowAuthModal={handleShowRegister} />} />
            </Route>
-           <Route path ='*' element={<PagenotFound />}/>
+           <Route path ='*' element={<PagenotFound handleShowAuthModal={handleShowRegister} />}/>
        </Routes>
 
         <Modal show={showAuthModal} onHide={handleCloseAuthModal} centered

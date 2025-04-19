@@ -1,10 +1,15 @@
 import React from 'react';
 import Footer from "./Footer.jsx";
+import Header from "./Header.jsx";
 import {Helmet} from "react-helmet";
 
-const Layout = ({children, title, description, keywords, author}) => {
+const Layout = ({children, title, description, keywords, author, handleShowAuthModal}) => {
     return (
-        <div>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%'
+        }}>
             <Helmet>
                 <meta charSet="utf-8" />
                 <meta name="description" content={description} />
@@ -12,8 +17,10 @@ const Layout = ({children, title, description, keywords, author}) => {
                 <meta name="author" content={author} />
                 <title>{title}</title>
             </Helmet>
-            {/* <Header/> */}
-            <main style={{minHeight:'80vh'}}>
+            <Header handleShowAuthModal={handleShowAuthModal} />
+            <main style={{
+                flexGrow: 1
+            }}>
                 {children}
             </main>
             <Footer/>

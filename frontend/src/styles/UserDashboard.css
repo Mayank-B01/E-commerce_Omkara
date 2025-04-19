@@ -1,0 +1,156 @@
+/* General Dashboard Layout */
+.dashboard-container {
+    display: flex;
+    gap: 20px; /* Space between menu and content */
+    padding: 20px;
+    background-color: #f8f9fa; /* Light background for the page */
+    min-height: 70vh;
+}
+
+.dashboard-menu {
+    flex: 0 0 200px; /* Fixed width for the menu */
+}
+
+.dashboard-content {
+    flex: 1; /* Content takes remaining space */
+    background-color: #a3b18a; /* Green background from screenshot */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Content Area Specific Styles (Placeholders, adjust as needed) */
+.dashboard-content h3,
+.dashboard-content h4 {
+    color: #343a40;
+    margin-bottom: 20px;
+}
+
+.dashboard-content p {
+    color: #495057;
+    line-height: 1.6;
+}
+
+/* Form Styles (for Profile/Address) */
+.dashboard-form .form-label {
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #343a40;
+}
+
+.dashboard-form .form-control {
+    margin-bottom: 15px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+}
+
+.dashboard-form .form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-row-split {
+    display: flex;
+    gap: 15px;
+}
+.form-row-split > div {
+    flex: 1;
+}
+
+.password-change-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #ced4da; /* Separator */
+}
+
+/* Button Styles */
+.btn-save-changes {
+    background-color: #e9ecef;
+    border: 1px solid #adb5bd;
+    color: #495057;
+    padding: 8px 20px;
+    border-radius: 20px; /* Pill shape */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    float: right; /* Position as in screenshots */
+    margin-top: 10px;
+}
+
+.btn-save-changes:hover {
+    background-color: #dee2e6;
+}
+
+/* Address Page Styles */
+.address-section {
+    margin-bottom: 30px;
+    position: relative; /* For positioning the edit icon */
+}
+
+.address-section h4 {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 5px;
+}
+
+.edit-address-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    color: #495057;
+    font-size: 1.2rem;
+}
+
+.edit-address-icon:hover {
+    color: #000;
+}
+
+/* Order History Styles */
+.order-item {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa; /* Lighter background for contrast */
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.order-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 20px;
+}
+
+.order-item-details {
+    flex-grow: 1;
+}
+
+.order-item-details h5 {
+    margin-bottom: 5px;
+    color: #343a40;
+}
+
+.order-item-details p {
+    margin-bottom: 3px;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.btn-go-to-product {
+    background-color: #e9ecef;
+    border: 1px solid #adb5bd;
+    color: #495057;
+    padding: 6px 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    font-size: 0.9rem;
+    margin-left: 15px; /* Space it from details */
+}
+
+.btn-go-to-product:hover {
+    background-color: #dee2e6;
+} 
