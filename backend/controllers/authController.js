@@ -4,8 +4,6 @@ const {hashPassword, comparePassword} = require("../utils/authHelp.js");
 const JWT = require('jsonwebtoken');
 
 const validatePhoneNumber = (number) => /^\d{10}$/.test(number);
-// Relaxed password validation for update, ensure frontend enforces complexity if needed
-// const validatePassword = (password) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#%*&$!]).{8,}$/.test(password);
 
 const registerController = async (req, res) => {
     try{

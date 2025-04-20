@@ -1,23 +1,24 @@
-const { EsewaPaymentGateway, EsewaCheckStatus, base64Decode } = require('esewajs');
+let EsewaPaymentGateway, EsewaCheckStatus, base64Decode;
+
+(async () => {
+  const esewa = await import('esewajs');
+  EsewaPaymentGateway = esewa.EsewaPaymentGateway;
+  EsewaCheckStatus = esewa.EsewaCheckStatus;
+  base64Decode = esewa.base64Decode;
+})();
 const crypto = require('crypto');
 
-// --- TODO: Create or Import your DB Model ---
-// const Transaction = require('../models/transactionModel.js');
-
-// --- Helper: Generate Signature (Manual) ---
-// Keep this helper for potential use in callbacks
 const generateSignature = (message, secret) => {
     const hmac = crypto.createHmac('sha256', secret);
     hmac.update(message);
     return hmac.digest('base64');
 };
 
-// --- Controller: Initiate Payment ---
 const EsewaInitiatePayment = async (req, res) => {
-    // Use orderId from frontend, not productId. Amount comes from frontend.
+    
     const { amount, orderId } = req.body;
-    const successUrl = process.env.SUCCESS_URL; // Expecting backend callback URL
-    const failureUrl = process.env.FAILURE_URL; // Expecting backend callback URL
+    const successUrl = process.env.SUCCESS_URL; 
+    const failureUrl = process.env.FAILURE_URL; 
 
     console.log(`[eSewa Initiate] Received Order ID: ${orderId}, Amount: ${amount}`);
 
@@ -36,12 +37,12 @@ const EsewaInitiatePayment = async (req, res) => {
         console.log(`[eSewa Initiate] SuccessURL: ${successUrl}, FailureURL: ${failureUrl}`);
 
         const reqPayment = await EsewaPaymentGateway(
-            amount, 0, 0, 0, // Amount, Tax, Service Charge, Delivery Charge
-            orderId,         // Use the unique orderId from frontend as transaction ID
+            amount, 0, 0, 0, 
+            orderId,         
             process.env.MERCHANT_ID,
             process.env.SECRET,
-            successUrl,      // Backend success callback URL
-            failureUrl,      // Backend failure callback URL
+            successUrl,      
+            failureUrl,     
             process.env.ESEWAPAYMENT_URL,
             undefined, undefined
         );
@@ -51,24 +52,22 @@ const EsewaInitiatePayment = async (req, res) => {
             return res.status(500).json({ success: false, message: "Error initiating payment with gateway." });
         }
 
-        // --- TODO: Create Transaction Record (Consider moving to success callback) ---
         /*
         console.log(`[eSewa Initiate] Saving initial transaction record for Order ID: ${orderId}`);
         const newTransaction = new Transaction({
             orderId: orderId,
-            amount: amount,
+                amount: amount,
             status: 'initiated',
         });
         await newTransaction.save();
         console.log(`[eSewa Initiate] Transaction ${orderId} saved with status 'initiated'.`);
         */
-        // --- End TODO ---
 
         console.log(`[eSewa Initiate] Success! Redirecting user to eSewa for Order ID: ${orderId}`);
         return res.status(200).send({
             success: true,
             message: "Redirect URL generated.",
-            url: reqPayment.request.res.responseUrl,
+                url: reqPayment.request.res.responseUrl,
         });
 
     } catch (error) {
@@ -77,9 +76,9 @@ const EsewaInitiatePayment = async (req, res) => {
     }
 };
 
-// --- Controller: Check Payment Status (Manual Check - Use Callbacks Primarily) ---
+
 const paymentStatus = async (req, res) => {
-    // Expect orderId in request body now
+    
     const { orderId } = req.body;
     console.log(`[eSewa Status Check] Received request for Order ID: ${orderId}`);
 
@@ -88,16 +87,11 @@ const paymentStatus = async (req, res) => {
     }
 
     try {
-        // --- TODO: Find transaction in DB by orderId to get the amount ---
-        // const transaction = await Transaction.findOne({ orderId: orderId });
         const transaction = { amount: 0, status: 'not_found' }; // Placeholder - Replace with DB Query
-        // --- End TODO ---
-
         if (!transaction || transaction.status === 'not_found') {
             console.warn(`[eSewa Status Check] Transaction not found in DB for Order ID: ${orderId}`);
             return res.status(404).json({ success: false, message: "Transaction not found" });
         }
-        // Optional: If already completed via callback, return early
         if (transaction.status === 'completed') {
              console.log(`[eSewa Status Check] Transaction ${orderId} already marked completed in DB.`);
             return res.status(200).json({ success: true, status: transaction.status, message: "Transaction already completed." });
@@ -105,8 +99,8 @@ const paymentStatus = async (req, res) => {
 
         console.log(`[eSewa Status Check] Calling EsewaCheckStatus API for Order ID: ${orderId}, Amount: ${transaction.amount}`);
         const paymentStatusCheck = await EsewaCheckStatus(
-            transaction.amount, // Use amount from YOUR DB record
-            orderId,            // Use the orderId
+            transaction.amount,
+            orderId,
             process.env.MERCHANT_ID,
             process.env.ESEWAPAYMENT_STATUS_CHECK_URL
         );
@@ -115,16 +109,7 @@ const paymentStatus = async (req, res) => {
 
         if (paymentStatusCheck.status === 200 && paymentStatusCheck.data?.status) {
             const esewaStatus = paymentStatusCheck.data.status;
-            console.log(`[eSewa Status Check] eSewa API reported status '${esewaStatus}' for Order ID: ${orderId}`);
-
-            // --- TODO: Update DB transaction status based on this check (Use with caution) ---
-            // Only update if you trust this flow more than the callback, or as a fallback.
-            /*
-            const dbStatus = esewaStatus === 'COMPLETE' ? 'completed' : 'failed';
-            await Transaction.findOneAndUpdate({ orderId: orderId }, { status: dbStatus }, { new: true });
-            console.log(`[eSewa Status Check] DB status updated to '${dbStatus}' for Order ID: ${orderId}`);
-            */
-            // --- End TODO ---
+            console.log(`[eSewa Status Check] eSewa API reported status '${esewaStatus}' for Order ID: ${orderId}`)
 
             res.status(200).json({
                 success: true,
@@ -141,7 +126,7 @@ const paymentStatus = async (req, res) => {
     }
 };
 
-// --- Controller: Handle SUCCESS Callback (Called by eSewa) ---
+
 const handleEsewaSuccessCallback = async (req, res) => {
     const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
     let orderId = 'UNKNOWN';
@@ -152,32 +137,27 @@ const handleEsewaSuccessCallback = async (req, res) => {
 
         if (!data) {
             console.error("[eSewa Success Callback] Error: 'data' parameter missing.");
-            // Redirect to CART on failure
             return res.redirect(`${clientUrl}/cart?payment_status=failure&message=InvalidCallbackResponse`);
         }
 
-        // 1. Decode Data
         let decodedData;
         try {
             decodedData = base64Decode(data);
             console.log("[eSewa Success Callback] Decoded Data:", decodedData);
         } catch (decodeError) {
              console.error("[eSewa Success Callback] Error decoding Base64 data:", decodeError);
-             // Redirect to CART on failure
              return res.redirect(`${clientUrl}/cart?payment_status=failure&message=InvalidCallbackDataFormat`);
         }
 
         const { transaction_uuid, status, total_amount, signature: receivedSignature, signed_field_names, transaction_code, product_code } = decodedData;
         orderId = transaction_uuid;
 
-        // 2. Basic Status Check
         if (status !== 'COMPLETE') {
             console.warn(`[eSewa Success Callback] Warning: Transaction ${orderId} status is '${status}', not 'COMPLETE'. Treating as failure.`);
-             // Redirect to CART on failure
+            
             return res.redirect(`${clientUrl}/cart?payment_status=failure&orderId=${orderId}&message=PaymentNotCompleted&status=${status}`);
         }
 
-        // 3. --- CRITICAL: Signature Verification ---
         const verification_string = `transaction_code=${transaction_code},status=${status},total_amount=${total_amount},transaction_uuid=${transaction_uuid},product_code=${product_code},signed_field_names=${signed_field_names}`;
         const calculatedSignature = generateSignature(verification_string, process.env.SECRET);
 
@@ -193,26 +173,20 @@ const handleEsewaSuccessCallback = async (req, res) => {
 
         console.log(`[eSewa Success Callback] Signature verified successfully for order ${orderId}.`);
 
-        // --- (Optional) Server-to-Server Verification (ensure it also redirects to /cart on failure) --- 
-        /* ... */
+        // let dbErrorOccurred = false;
+        // try {
+        //     const existingOrder = await Order.findOne({ orderId: orderId });
+        //     if (!existingOrder) {
+        //          // ... (find buyer, create order logic) ...
+        //          // const buyer = await User.findOne(...) // etc.
+        //          // const newOrder = new Order({...});
+        //          // await newOrder.save();
+        //     }
+        // } catch (dbError) {
+        //      dbErrorOccurred = true;
+        //      console.error(`[eSewa Success Callback] CRITICAL: Error saving order ${orderId} to DB:`, dbError);
+        // }
 
-        // 4. --- Create Order in Database --- 
-        // ... (DB logic as before) ...
-        let dbErrorOccurred = false;
-        try {
-            const existingOrder = await Order.findOne({ orderId: orderId });
-            if (!existingOrder) {
-                 // ... (find buyer, create order logic) ...
-                 // const buyer = await User.findOne(...) // etc.
-                 // const newOrder = new Order({...});
-                 // await newOrder.save();
-            }
-        } catch (dbError) {
-             dbErrorOccurred = true;
-             console.error(`[eSewa Success Callback] CRITICAL: Error saving order ${orderId} to DB:`, dbError);
-        }
-
-        // 5. Redirect to Frontend HOMEPAGE with appropriate status
         console.log(`[eSewa Success Callback] Redirecting user to frontend HOMEPAGE for order ${orderId}.`);
         if (dbErrorOccurred) {
              res.redirect(`${clientUrl}/?payment_status=success_db_error&orderId=${orderId}`);
@@ -220,14 +194,13 @@ const handleEsewaSuccessCallback = async (req, res) => {
             res.redirect(`${clientUrl}/?payment_status=success&orderId=${orderId}`);
         }
 
-    } catch (error) { // Catches major errors in success callback
+    } catch (error) {
         console.error("[eSewa Success Callback] Internal Server Error:", error);
-         // Redirect to CART on failure
         res.redirect(`${clientUrl}/cart?payment_status=failure&orderId=${orderId}&message=ServerError`);
     }
 };
 
-// --- Controller: Handle FAILURE Callback (Called by eSewa) --- 
+
 const handleEsewaFailureCallback = async (req, res) => {
     const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
     let orderId = 'UNKNOWN';
@@ -238,22 +211,14 @@ const handleEsewaFailureCallback = async (req, res) => {
         const esewaRefId = req.query.refId;
         console.log(`[eSewa Failure Callback] Processing failure for Order ID: ${orderId}, eSewa Ref: ${esewaRefId}`);
 
-        // --- TODO: Update DB status to 'failed' if needed --- 
-        /* ... */
-        // --- End TODO --- 
-
-        // Redirect to Frontend CART Page with Failure Flags
         console.log(`[eSewa Failure Callback] Redirecting user to frontend CART page for order ${orderId}.`);
-        res.redirect(`${clientUrl}/cart?payment_status=failure&orderId=${orderId}&message=PaymentFailedOrCancelled`); // Point to /cart
+        res.redirect(`${clientUrl}/cart?payment_status=failure&orderId=${orderId}&message=PaymentFailedOrCancelled`);
 
     } catch (error) {
         console.error("[eSewa Failure Callback] Internal Server Error:", error);
-        // Redirect to CART even on server error in failure callback
-        res.redirect(`${clientUrl}/cart?payment_status=failure&orderId=${orderId}&message=ServerError`); // Point to /cart
+        res.redirect(`${clientUrl}/cart?payment_status=failure&orderId=${orderId}&message=ServerError`);
     }
 };
-
-// Export all functions using module.exports
 module.exports = {
     EsewaInitiatePayment,
     handleEsewaSuccessCallback,

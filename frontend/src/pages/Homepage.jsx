@@ -154,7 +154,6 @@ const Homepage = ({ handleShowAuthModal }) => {
                 </div>
             </section>
 
-            {/* Call to Action */}
             <section className="cta-section">
                 <h2>Wanna Be a Trend?</h2>
                 <Link to="/category" className="cta-button">See Trending Now</Link>

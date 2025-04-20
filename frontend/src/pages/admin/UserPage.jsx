@@ -63,7 +63,6 @@ const UserPage = () => {
         }
     };
 
-    // --- Delete User Logic ---
     const handleDelete = async (userId, userName) => {
         // Confirmation dialog
         if (!window.confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
@@ -76,7 +75,7 @@ const UserPage = () => {
             
             if (data?.success) {
                 toast.success(data.message || `User "${userName}" deleted successfully.`);
-                fetchUsers(); // Refresh the user list after deletion
+                fetchUsers();
             } else {
                 toast.error(data?.message || "Failed to delete user.");
             }
@@ -89,7 +88,6 @@ const UserPage = () => {
             }
         }
     };
-    // -----------------------
 
     useEffect(() => {
         document.title = 'Admin - User Management';
@@ -100,15 +98,10 @@ const UserPage = () => {
         setRoleFilter(newFilter);
     };
 
-    // --- Navigate to Orders Page (filtered by user) ---
     const handleViewOrders = (userId) => {
-        // Navigate to the main admin orders page
-        // Pass the userId in state to allow potential filtering on the OrderPage
         navigate('/dashboard/admin/orders', { state: { filterByUserId: userId } });
-        // Note: The OrderPage component will need to be modified to check for 
-        // location.state.filterByUserId and apply the filter if present.
+
     };
-    // -------------------------------------------------
 
     return (
         <>

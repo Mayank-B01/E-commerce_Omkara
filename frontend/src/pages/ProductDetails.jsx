@@ -12,10 +12,10 @@ const ProductDetails = ({ handleShowAuthModal }) => {
     const [cart, setCart] = useCart();
     const [product, setProduct] = useState({});
     const [relatedProducts, setRelatedProducts] = useState([]);
-    const [selectedSize, setSelectedSize] = useState(null); // State for selected size
-    const [quantity, setQuantity] = useState(1); // State for quantity
+    const [selectedSize, setSelectedSize] = useState(null);
+    const [quantity, setQuantity] = useState(1); 
 
-    // Initial product details fetch
+
     useEffect(() => {
         if (params?.slug) getProduct();
     }, [params?.slug]);
@@ -29,7 +29,6 @@ const ProductDetails = ({ handleShowAuthModal }) => {
             if (data?.success) {
                 setProduct(data?.product);
                 getSimilarProduct(data?.product._id, data?.product.category._id);
-                // Set default selected size if available
                 if (data?.product?.sizes?.length > 0) {
                     setSelectedSize(data.product.sizes[0]);
                 }
@@ -44,7 +43,6 @@ const ProductDetails = ({ handleShowAuthModal }) => {
         }
     };
 
-    // Get similar/related products
     const getSimilarProduct = async (pid, cid) => {
         try {
             const { data } = await axios.get(
@@ -71,8 +69,7 @@ const ProductDetails = ({ handleShowAuthModal }) => {
             toast.error("Please select a size");
             return;
         }
-        // Simple add - duplicates allowed for now
-        // For more complex logic (checking existing, updating quantity), replace below
+
         const updatedCart = [...cart, { ...product, selectedSize, quantity }];
         setCart(updatedCart);
         localStorage.setItem('cart', JSON.stringify(updatedCart));
@@ -82,38 +79,23 @@ const ProductDetails = ({ handleShowAuthModal }) => {
     return (
         <Layout title={product?.name || 'Product Details'} handleShowAuthModal={handleShowAuthModal}>
             <div className="container mt-4 product-details-container">
-                 {/* Breadcrumbs Removed */}
-                 {/* <nav aria-label="breadcrumb" className="mb-3">
-                    <ol className="breadcrumb">
-                        <li className="breadcrumb-item"><Link to="/">Home</Link></li>
-                        {product?.category && (
-                            <li className="breadcrumb-item"><Link to={`/category/${product.category.slug}`}>{product.category.name}</Link></li>
-                        )}
-                        <li className="breadcrumb-item active" aria-current="page">{product.name}</li>
-                    </ol>
-                 </nav> */}
-
                 <div className="row">
-                    {/* Product Image & Thumbnails */}
                     <div className="col-md-6 text-center mb-3 mb-md-0">
                         <img
                             src={product._id ? `${import.meta.env.VITE_API}/api/v1/product/product-photo/${product._id}` : ''} // Check product._id exists
                             className="img-fluid main-product-image"
                             alt={product.name}
                         />
-                         {/* Thumbnail Images Placeholder */}
+
                          <div className="product-thumbnails mt-3">
-                             {/* Placeholder for 3 thumbnails like the image */}
                              {product._id && [
                                 `${import.meta.env.VITE_API}/api/v1/product/product-photo/${product._id}`,
-                                /* Add more placeholder image URLs or logic if you have multiple images */
                              ].slice(0, 3).map((thumbUrl, index) => (
                                  <img 
                                     key={index} 
                                     src={thumbUrl} 
                                     alt={`${product.name} thumbnail ${index + 1}`} 
-                                    className="img-thumbnail product-thumbnail me-2" 
-                                    // Add onClick handler to change main image if needed
+                                    className="img-thumbnail product-thumbnail me-2"
                                 />
                              ))}
                          </div>
@@ -122,11 +104,6 @@ const ProductDetails = ({ handleShowAuthModal }) => {
                     {/* Product Details */}
                     <div className="col-md-6 product-info">
                         <h1 className="fw-bold mb-3">{product.name}</h1>
-                         
-                         {/* Type - Placeholder */}
-                         <p className="text-muted mb-3">Type: Unisex {/* Assuming 'Unisex' - Add logic if type is in model */}</p>
-
-                         {/* Sizes */}
                          {product?.sizes?.length > 0 && (
                              <div className="mb-3">
                                  <h6 className="detail-label">Size:</h6>
@@ -142,7 +119,6 @@ const ProductDetails = ({ handleShowAuthModal }) => {
                              </div>
                          )}
 
-                        {/* Colors - Placeholder */}
                          <div className="mb-3">
                              <h6 className="detail-label">Color:</h6>
                              {/* Add actual color logic if available in product model */}
@@ -151,7 +127,6 @@ const ProductDetails = ({ handleShowAuthModal }) => {
                              <button className="btn color-swatch me-2" style={{ backgroundColor: '#3B5998' /* Blue */ }} title="Blue"></button>
                          </div>
 
-                        {/* Quantity */}
                         <div className="mb-3 d-flex align-items-center quantity-selector">
                             <h6 className="detail-label me-3 mb-0">Quantity:</h6>
                             <button className="btn btn-outline-dark btn-sm me-2 quantity-btn" onClick={handleDecrement} disabled={quantity <= 1}>-</button>
@@ -159,10 +134,8 @@ const ProductDetails = ({ handleShowAuthModal }) => {
                             <button className="btn btn-outline-dark btn-sm quantity-btn" onClick={handleIncrement}>+</button>
                         </div>
 
-                        {/* Price */}
                         <h4 className="mb-4 price-display">Price: Rs {product.price}</h4>
 
-                        {/* Action Buttons */}
                         <div className="d-flex action-buttons mb-4">
                             <button className="btn btn-dark flex-grow-1 me-2" onClick={handleAddToCart}>
                                 <i className="bi bi-cart-plus-fill me-1"></i> Add to Cart
@@ -171,8 +144,7 @@ const ProductDetails = ({ handleShowAuthModal }) => {
                                 <i className="bi bi-bag-check-fill me-1"></i> Buy Now
                             </button>
                         </div>
-                        
-                        {/* Product Description */}
+
                         {product.description && (
                             <div>
                                 <h6 className="detail-label">Description:</h6>
@@ -184,7 +156,6 @@ const ProductDetails = ({ handleShowAuthModal }) => {
 
                 <hr className="my-5" />
 
-                {/* Recommended For You Section */}
                 <div className="row recommended-section">
                     <div className="section-header d-flex justify-content-between align-items-center mb-4">
                          <h2 className="mb-0">Recommended For You</h2>
@@ -210,10 +181,8 @@ const ProductDetails = ({ handleShowAuthModal }) => {
                                         </button>
                                         <button
                                             className='btn btn-sm btn-dark ms-1'
-                                            onClick={() => { 
-                                                // Add related product to cart (simple add)
-                                                // Note: This doesn't account for size/quantity selection for related items
-                                                const updatedCart = [...cart, p]; // Add the related product object 'p'
+                                            onClick={() => {
+                                                const updatedCart = [...cart, p]; 'p'
                                                 setCart(updatedCart);
                                                 localStorage.setItem('cart', JSON.stringify(updatedCart));
                                                 toast.success('Item added to cart!');

@@ -11,7 +11,6 @@ const cors = require('cors');
 //configuring environment
 dotenv.config();
 
-// Use original .then structure for DB connection
 connectDB()
     .then(() => {
         console.log('MongoDB Connected successfully.');

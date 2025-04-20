@@ -1,6 +1,5 @@
 import React from 'react';
 import Layout from "../components/Layout/Layout.jsx";
-import { Link } from 'react-router-dom';
 import '../styles/About.css';
 import founderImage from '../assets/women-category.png';
 import omkaraLogo from '../assets/omkara-logo.jpg';
@@ -9,14 +8,6 @@ const About = ({ handleShowAuthModal }) => {
     return (
         <Layout title={'About Us - Omkara'} handleShowAuthModal={handleShowAuthModal}>
             <div className="about-container">
-                {/* Breadcrumb Removed */}
-                {/* <div className="breadcrumb">
-                    <Link to="/">Home</Link>
-                    <span className="separator">▶</span>
-                    <span className="current">About Us</span>
-                </div> */}
-
-                {/* Main About Section */}
                 <div className="about-content">
                     <div className="about-text">
                         <h1>About Omkara</h1>
@@ -28,8 +19,6 @@ const About = ({ handleShowAuthModal }) => {
                         <div className="tagline">SUPPORT NEPALI ARTISANS</div>
                     </div>
                 </div>
-
-                {/* Founder Section */}
                 <div className="founder-section">
                     <h2>Hear from our Founder</h2>
                     <div className="founder-content">

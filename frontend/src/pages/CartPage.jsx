@@ -1,31 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout/Layout.jsx';
-import { useCart } from '../context/cart.jsx'; // Assuming cart context exists
+import { useCart } from '../context/cart.jsx';
 import { useAuth } from '../context/auth.jsx';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axios from 'axios'; // Import axios for API calls
-import '../styles/CartPage.css'; // Import custom CSS for styling
+import axios from 'axios';
+import '../styles/CartPage.css';
 
 const CartPage = ({ handleShowAuthModal }) => {
     const [auth, setAuth] = useAuth();
     const [cart, setCart] = useCart();
     const navigate = useNavigate();
-    const location = useLocation(); // Hook to get location object
-    const [isProcessing, setIsProcessing] = useState(false); // Add loading state
+    const location = useLocation();
+    const [isProcessing, setIsProcessing] = useState(false);
 
     // Calculate Total Price
     const totalPrice = () => {
         try {
             let total = 0;
             cart?.forEach((item) => {
-                // Use item.quantity if available, otherwise assume 1
+
                 total += item.price * (item.quantity || 1); 
             });
-            // Format as currency (adjust locale and options as needed)
+
             return total.toLocaleString("en-IN", { 
                 style: "currency",
-                currency: "INR", // Change currency code if needed
+                currency: "NRP",
             });
         } catch (error) {
             console.log("Error calculating total price:", error);
@@ -34,11 +34,9 @@ const CartPage = ({ handleShowAuthModal }) => {
     };
 
     // Remove item from cart
-    const removeCartItem = (productId, size) => { // Include size if items can be differentiated by size
+    const removeCartItem = (productId, size) => {
         try {
-            // Filter logic might need adjustment based on how items are stored (e.g., need size?)
             let myCart = [...cart];
-            // Find the first matching item (or use findIndex if removing only one instance)
             const index = myCart.findIndex(item => item._id === productId && item.selectedSize === size);
             if (index !== -1) {
                 myCart.splice(index, 1);
@@ -85,30 +83,26 @@ const CartPage = ({ handleShowAuthModal }) => {
             else if (message === 'PaymentNotCompleted') displayMessage = `The payment process was not completed (Status: ${status || 'N/A'}).`;
             else if (message === 'InvalidCallbackResponse' || message === 'InvalidCallbackDataFormat') displayMessage = "Error receiving payment confirmation.";
             else if (message === 'ServerError') displayMessage = "A server error occurred during payment confirmation.";
-            // Add more specific messages if needed
-
             toast.error(`Payment Failed: ${displayMessage}${orderId && orderId !== 'UNKNOWN' ? ` (Order ID: ${orderId})` : ''}`);
-            // Remove query parameters from URL without reloading page
+
             navigate('/cart', { replace: true });
         }
 
-        // Clear success parameters if user navigates back here after success on homepage
         if (paymentStatus === 'success' || paymentStatus === 'success_db_error'){
              navigate('/cart', { replace: true });
         }
 
-    }, [location, navigate]); // Re-run effect if location changes
+    }, [location, navigate]);
 
-    // Handle eSewa Checkout - UPDATED
+
     const handleEsewaCheckout = async () => {
-        if (isProcessing) return; // Prevent double clicks
+        if (isProcessing) return;
         setIsProcessing(true);
         toast.info("Initiating payment process...");
 
         try {
-            // 1. Prepare payment data
+
             const orderAmount = parseFloat(totalPrice().replace(/[^\d.-]/g,"")); // Extract number
-            // Generate a more robust unique Order ID
             const uniqueOrderId = `OMK-${Date.now()}-${auth.user?._id?.slice(-4) || 'GUEST'}`;
 
             if (orderAmount <= 0) {
@@ -118,19 +112,14 @@ const CartPage = ({ handleShowAuthModal }) => {
             }
 
             console.log(`[Frontend Checkout] Initiating payment for Order ID: ${uniqueOrderId}, Amount: ${orderAmount}`);
-
-            // 2. Call backend to initiate payment
             const { data } = await axios.post(
                 `${import.meta.env.VITE_API}/api/v1/esewa/initiate`, // Correct backend route
                 {
                     amount: orderAmount,
                     orderId: uniqueOrderId,
-                    // Optionally send cart details if needed for pre-saving order on backend
-                    // cartItems: cart.map(item => ({ product: item._id, quantity: item.quantity, size: item.selectedSize }))
                 },
                 {
                     headers: {
-                         // Add "Bearer " prefix before the token
                         Authorization: `Bearer ${auth?.token}` 
                     }
                 }
@@ -140,7 +129,6 @@ const CartPage = ({ handleShowAuthModal }) => {
             if (data?.success && data?.url) {
                 console.log("[Frontend Checkout] Received redirect URL from backend. Redirecting...");
                 toast.success("Redirecting to eSewa for payment...");
-                // Redirect the user to the eSewa payment page URL provided by the backend
                 window.location.href = data.url;
             } else {
                 console.error("[Frontend Checkout] Failed to initiate eSewa payment:", data?.message);
@@ -154,8 +142,6 @@ const CartPage = ({ handleShowAuthModal }) => {
             toast.error(errorMsg);
             setIsProcessing(false);
         }
-        // Note: setIsProcessing(false) is handled within success/error paths above
-        // No need to set it here unless the redirect fails instantly (unlikely)
     };
 
     return (
@@ -249,7 +235,6 @@ const CartPage = ({ handleShowAuthModal }) => {
                                 <button
                                     className="btn btn-success"
                                     onClick={handleEsewaCheckout}
-                                    // Disable button if processing, not logged in, no address, or cart empty
                                     disabled={isProcessing || !auth?.token || !auth?.user?.address || cart?.length === 0}
                                 >
                                     {isProcessing ? "Processing..." : "Proceed to Checkout (eSewa)"}

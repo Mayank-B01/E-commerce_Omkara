@@ -1,21 +1,17 @@
 const Order = require('../models/orderModel'); // Assuming order model is imported
 
-// Controller to get all orders (Admin only), optionally filtered by user
 const getAllOrdersController = async (req, res) => {
     try {
         const filter = {};
-
-        // Check for userId query parameter for filtering
         if (req.query.userId) {
-            // Validate if it's a reasonable ID format if necessary (e.g., ObjectId)
-            filter.buyer = req.query.userId; // Filter by the buyer field
+            filter.buyer = req.query.userId;
         }
 
         console.log("Fetching orders with filter:", filter);
         
         const orders = await Order.find(filter)
-            .populate("products", "-photo") // Populate product details (excluding photo)
-            .populate("buyer", "name email") // Populate buyer's name and email
+            .populate("products", "-photo")
+            .populate("buyer", "name email")
             .sort({ createdAt: -1 });
 
         res.status(200).send({
@@ -35,9 +31,6 @@ const getAllOrdersController = async (req, res) => {
     }
 };
 
-// --- Other order controller functions (update status, etc.) ---
-
-// Example: updateOrderStatusController (assuming it exists)
 const updateOrderStatusController = async (req, res) => {
     try {
         const { orderId } = req.params;
@@ -46,7 +39,7 @@ const updateOrderStatusController = async (req, res) => {
         const order = await Order.findByIdAndUpdate(
             orderId,
             { status },
-            { new: true } // Return the updated document
+            { new: true }
         );
 
         if (!order) {
@@ -69,11 +62,10 @@ const updateOrderStatusController = async (req, res) => {
     }
 };
 
-// Add other required controllers like getOrderStatsController if they exist in this file
+
 const getOrderStatsController = async (req, res) => {
     try {
         const count = await Order.countDocuments({}); // Example: count all orders
-        // Example: calculate revenue (adjust based on your schema/logic)
         const revenueResult = await Order.aggregate([
             { $match: { status: 'Delivered' } }, // Example: only count delivered for revenue
             { $group: { _id: null, totalRevenue: { $sum: '$payment.transaction.amount' } } } 
@@ -90,6 +82,5 @@ const getOrderStatsController = async (req, res) => {
 module.exports = { 
     getAllOrdersController, 
     updateOrderStatusController, 
-    getOrderStatsController 
-    // Add other exported functions from this file
+    getOrderStatsController
 }; 

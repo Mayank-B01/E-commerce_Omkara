@@ -8,7 +8,6 @@ import '../../styles/UserDashboard.css';
 const Dashboard = ({ handleShowAuthModal }) =>{
     const [auth] = useAuth();
 
-    // Helper function to format the date
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -31,8 +30,6 @@ const Dashboard = ({ handleShowAuthModal }) =>{
                         <div className='data'>
                             <h4>Email: {auth?.user?.email}</h4>
                             <h4>Phone: {auth?.user?.phone}</h4>
-                            <h4>Address: {auth?.user?.address || 'Not Added'}</h4>
-                            <h4>Account Created on: {auth?.user?.createdAt}</h4>
                         </div>
                         <NavLink className='btn btn-outline-dark w-25' to='/dashboard/user/address'>Edit Address</NavLink>
                         <div className='data'>

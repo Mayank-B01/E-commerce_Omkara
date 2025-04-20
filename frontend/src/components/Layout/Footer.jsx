@@ -61,7 +61,6 @@ const Footer = () => {
                     <p>&copy; 2025 Copyright All rights reserved</p>
                 </div>
 
-                {/* Image positioned slightly to the left */}
                 <img
                     src="/icon.jpg"
                     alt="omkara logo"

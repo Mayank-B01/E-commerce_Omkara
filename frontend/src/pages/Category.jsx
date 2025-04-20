@@ -4,8 +4,8 @@ import Layout from "../components/Layout/Layout.jsx";
 import {useAuth} from "../context/auth.jsx";
 import axios from 'axios';
 import {Prices} from "../components/Prices.js";
-import { toast } from 'react-toastify'; // Import toast
-import { useCart } from "../context/cart.jsx"; // Import useCart
+import { toast } from 'react-toastify';
+import { useCart } from "../context/cart.jsx";
 
 // Static sizes for now
 const Sizes = ["S", "M", "L", "XL", "XXL"];
@@ -24,7 +24,6 @@ const Category = ({ handleShowAuthModal }) => {
     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
     const [searchNameFromUrl, setSearchNameFromUrl] = useState("");
 
-    // Fetch categories on mount
     const getAllCategories = async () => {
         try {
             const { data } = await axios.get(`${import.meta.env.VITE_API}/api/v1/category/allCategory`);
@@ -41,73 +40,58 @@ const Category = ({ handleShowAuthModal }) => {
         getAllCategories();
     }, []);
 
-    // Fetch initial products based on URL parameters (or all if none)
+
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const nameSearch = params.get('searchName');
-        const categorySlugFromUrl = params.get('cat'); // Check for 'cat' param as well
-        let handledByUrl = false; // Flag to see if URL params dictated the load
+        const categorySlugFromUrl = params.get('cat');
+        let handledByUrl = false;
         
-        setInitialLoadComplete(false); // Reset flag on location change
-        setSearchNameFromUrl(""); // Reset name search by default
-        // Don't reset checked here, let the specific param handlers do it
+        setInitialLoadComplete(false);
+        setSearchNameFromUrl("");
 
         if (nameSearch) {
             console.log("Handling searchName:", nameSearch);
-            setSearchNameFromUrl(nameSearch); 
-            // Clear specific filters when coming from name search link
-            setChecked([]); // Reset category filter on name search
+            setSearchNameFromUrl(nameSearch);
+            setChecked([]);
             setRadio([]);
             setCheckedSizes([]);
             setSortBy("");
             fetchProductsByCategoryName(nameSearch); 
             handledByUrl = true;
-        } else if (categorySlugFromUrl && categories.length > 0) { // Handle 'cat' ONLY if categories are loaded
+        } else if (categorySlugFromUrl && categories.length > 0) {
              console.log("Handling cat:", categorySlugFromUrl);
              const targetCategory = categories.find(c => c.slug === categorySlugFromUrl);
              if (targetCategory) {
-                 // Check the corresponding category filter
-                 setChecked([targetCategory._id]); 
-                 // Reset other filters when navigating from header category link
+                 setChecked([targetCategory._id]);
                  setRadio([]); 
                  setCheckedSizes([]);
                  setSortBy("");
-                 // filterProduct will be called by the other useEffect due to `checked` changing
+
              } else {
                  console.warn(`Category slug "${categorySlugFromUrl}" from URL not found.`);
-                 setChecked([]); // Clear category filter if slug invalid
+                 setChecked([]);
              }
              handledByUrl = true;
         } else if (categorySlugFromUrl && categories.length === 0) {
-            // If cat param exists but categories not loaded yet, DO NOTHING here.
-            // Wait for categories to load, which will re-trigger this effect.
              console.log("'cat' param found, but categories not loaded yet. Waiting...");
-             // handledByUrl remains false
+
         } else if (!categorySlugFromUrl && !nameSearch) {
-            // If NO category or name search param in URL (e.g., navigating to /category)
-            // Clear the category filter explicitly.
             console.log("No 'cat' or 'searchName' found in URL, clearing category filter.");
-            setChecked([]); 
-            // Resetting other filters might be redundant but safe:
+            setChecked([]);
             setRadio([]); 
             setCheckedSizes([]);
             setSortBy("");
-            handledByUrl = true; // Indicate URL (absence of params) was handled
+            handledByUrl = true;
         }
 
-        // If URL params didn't dictate the load, let the other effect handle it
-        // (either load all or use existing filters)
          console.log("Initial load handled by URL:", handledByUrl);
-        setInitialLoadComplete(true); // Mark initial load logic attempt as complete
+        setInitialLoadComplete(true);
 
-    }, [location.search, categories]); // Re-run if location or categories change
+    }, [location.search, categories]);
 
-    // Fetch products based on checkbox/radio/size/sort filters (Revised)
      useEffect(() => {
-        // Only run if initial load logic is complete
-        if (!initialLoadComplete) return; 
-
-        // If a name search term is active from the URL, don't filter based on checkboxes etc.
+        if (!initialLoadComplete) return;
         if (searchNameFromUrl) return; 
 
         const hasFilters = checked.length > 0 || radio.length > 0 || checkedSizes.length > 0 || sortBy;
@@ -116,7 +100,6 @@ const Category = ({ handleShowAuthModal }) => {
         if (hasFilters) {
             filterProduct(); 
         } else {
-            // If filters are cleared (or none were set initially), fetch all products
             getAllProducts();
         }
 
@@ -152,7 +135,6 @@ const Category = ({ handleShowAuthModal }) => {
 
     // Fetch products by filters (checkboxes, radio, size, sort)
     const filterProduct = async () => {
-        // If using filters, clear the name search state
         setSearchNameFromUrl(""); 
         try {
             const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/product/product-filters`, { checked, radio, checkedSizes, sortBy });
@@ -191,20 +173,14 @@ const Category = ({ handleShowAuthModal }) => {
         setRadio([]);
         setCheckedSizes([]);
         setSortBy("");
-        setSearchNameFromUrl(""); // Also clear name search on manual reset
-        // Call getAllProducts directly after resetting if needed, or let useEffect handle it
-        // getAllProducts(); 
+        setSearchNameFromUrl("");
+
     }
 
     return(
         <Layout title={'Omkara - Products'} handleShowAuthModal={handleShowAuthModal}>
             <div className="container-fluid row mt-3">
-                {/* Breadcrumb or Title Removed */}
-                {/* <div className="col-md-12 mb-3">
-                    <h1 className="text-center">Trending</h1>
-                 </div> */}
 
-                {/* Filters Section */}
                 <div className="col-md-2">
                     {/* Display search term if active */}
                     {searchNameFromUrl && (
@@ -312,8 +288,7 @@ const Category = ({ handleShowAuthModal }) => {
                                     <button
                                         className='btn btn-sm btn-dark ms-1'
                                         onClick={() => {
-                                            // Add product to cart (simple add, quantity 1, no size selected here)
-                                            const updatedCart = [...cart, { ...p, quantity: 1 }]; // Add product p with default quantity 1
+                                            const updatedCart = [...cart, { ...p, quantity: 1 }]; 
                                             setCart(updatedCart);
                                             localStorage.setItem('cart', JSON.stringify(updatedCart));
                                             toast.success('Item added to cart!');
