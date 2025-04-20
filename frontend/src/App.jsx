@@ -26,6 +26,8 @@ import CategoryPage from "./pages/Admin/CategoryPage.jsx";
 import Category from "./pages/Category.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
 import CartPage from "./pages/CartPage.jsx";
+import Success from "./components/Success.jsx";
+import Failure from "./components/Failure.jsx";
 
 function App() {
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -44,6 +46,11 @@ function App() {
     };
 
     const handleShowLogin = () => {
+        setModalContent('login');
+        setShowAuthModal(true);
+    };
+
+    const handleShowAuthModalDefault = () => {
         setModalContent('login');
         setShowAuthModal(true);
     };
@@ -68,28 +75,29 @@ function App() {
             pauseOnHover
         />
        <Routes>
-           <Route path ='/' element={<Homepage handleShowAuthModal={handleShowRegister} />} />
-           <Route path ='/about' element={<About handleShowAuthModal={handleShowRegister} />} />
-           <Route path ='/contact' element={<Contact handleShowAuthModal={handleShowRegister} />} />
-           <Route path ='/policy' element={<Policy handleShowAuthModal={handleShowRegister} />}/>
-           <Route path ='/category' element={<Category handleShowAuthModal={handleShowRegister} />}/>
-           <Route path ='/product/:slug' element={<ProductDetails handleShowAuthModal={handleShowRegister} />} />
-           <Route path ='/cart' element={<CartPage handleShowAuthModal={handleShowRegister} />} />
+           <Route path ='/' element={<Homepage handleShowAuthModal={handleShowAuthModalDefault} />} />
+           <Route path ='/about' element={<About handleShowAuthModal={handleShowAuthModalDefault} />} />
+           <Route path ='/contact' element={<Contact handleShowAuthModal={handleShowAuthModalDefault} />} />
+           <Route path ='/policy' element={<Policy handleShowAuthModal={handleShowAuthModalDefault} />}/>
+           <Route path ='/category' element={<Category handleShowAuthModal={handleShowAuthModalDefault} />}/>
+           <Route path ='/product/:slug' element={<ProductDetails handleShowAuthModal={handleShowAuthModalDefault} />} />
+           <Route path ='/cart' element={<CartPage handleShowAuthModal={handleShowAuthModalDefault} />} />
            <Route path ='/dashboard' element={<PrivateRoute />}>
-               <Route path ='user' element={<Dashboard handleShowAuthModal={handleShowRegister} />} />
-               <Route path ='user/order' element={<UserOrder handleShowAuthModal={handleShowRegister} />} />
-               <Route path ='user/address' element={<Address handleShowAuthModal={handleShowRegister} />} />
-               <Route path ='user/account' element={<Profile handleShowAuthModal={handleShowRegister} />} />
-
+               <Route path ='user' element={<Dashboard handleShowAuthModal={handleShowAuthModalDefault} />} />
+               <Route path ='user/order' element={<UserOrder handleShowAuthModal={handleShowAuthModalDefault} />} />
+               <Route path ='user/address' element={<Address handleShowAuthModal={handleShowAuthModalDefault} />} />
+               <Route path ='user/account' element={<Profile handleShowAuthModal={handleShowAuthModalDefault} />} />
+               <Route path = 'user/payment-success' element={<Success/>} />
+               <Route path = 'user/payment-failure' element={<Failure/>} />
            </Route>
            <Route path ='/dashboard' element={<AdminRoute />}>
-               <Route path ='admin' element={<AdminDashboard handleShowAuthModal={handleShowRegister} />} />
-               <Route path ='admin/users' element={<UserPage handleShowAuthModal={handleShowRegister} />} />
-               <Route path ='admin/products' element={<ProductPage handleShowAuthModal={handleShowRegister} />} />
-               <Route path ='admin/category' element={<CategoryPage handleShowAuthModal={handleShowRegister} />} />
-               <Route path ='admin/orders' element={<OrderPage handleShowAuthModal={handleShowRegister} />} />
+               <Route path ='admin' element={<AdminDashboard />} />
+               <Route path ='admin/users' element={<UserPage />} />
+               <Route path ='admin/products' element={<ProductPage />} />
+               <Route path ='admin/category' element={<CategoryPage />} />
+               <Route path ='admin/orders' element={<OrderPage />} />
            </Route>
-           <Route path ='*' element={<PagenotFound handleShowAuthModal={handleShowRegister} />}/>
+           <Route path ='*' element={<PagenotFound handleShowAuthModal={handleShowAuthModalDefault} />}/>
        </Routes>
 
         <Modal show={showAuthModal} onHide={handleCloseAuthModal} centered

@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Select, Table, Space, Modal, Button, Checkbox } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../../context/auth';
 
 const { Option } = Select;
 
@@ -213,10 +214,23 @@ const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
 };
 
 const ProductPage = () => {
+    const navigate = useNavigate();
+    const [auth, setAuth] = useAuth();
     const [products, setProducts] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [categories, setCategories] = useState([]);
+
+    const handleLogout = () => {
+        setAuth({
+            ...auth,
+            user: null,
+            token: ''
+        });
+        localStorage.removeItem("auth");
+        toast.success("Logged out successfully.");
+        navigate('/');
+    };
 
     const getProducts = async () => {
         try {
@@ -243,6 +257,7 @@ const ProductPage = () => {
     };
 
     useEffect(() => {
+        document.title = "Admin - Product Management";
         getProducts();
         getCategories();
     }, []);
@@ -316,40 +331,48 @@ const ProductPage = () => {
     ];
 
     return (
-        <div className="container-fluid m-3 p-3">
-            <div className="row">
-                <div className="col-md-3">
-                    <AdminMenu />
-                </div>
-                <div className="col-md-9">
-                    <Button
-                        type="primary"
-                        onClick={() => {
-                            setSelectedProduct(null);
-                            setIsModalVisible(true);
-                        }}
-                        className="mb-3"
-                    >
-                        Create Product
-                    </Button>
-                    <Table
-                        dataSource={products}
-                        columns={columns}
-                        rowKey="_id"
-                        pagination={{ pageSize: 5 }}
-                    />
-                    <ProductModal
-                        visible={isModalVisible}
-                        onCancel={() => {
-                            setIsModalVisible(false);
-                            setSelectedProduct(null);
-                        }}
-                        onSuccess={getProducts}
-                        initialData={selectedProduct}
-                    />
+        <>
+            <div className="admin-custom-header d-flex justify-content-end p-3 bg-light border-bottom">
+                <button onClick={handleLogout} className="btn btn-outline-danger btn-sm">
+                    Logout
+                </button>
+            </div>
+
+            <div className="container-fluid m-3 p-3">
+                <div className="row">
+                    <div className="col-md-3">
+                        <AdminMenu />
+                    </div>
+                    <div className="col-md-9">
+                        <Button
+                            type="primary"
+                            onClick={() => {
+                                setSelectedProduct(null);
+                                setIsModalVisible(true);
+                            }}
+                            className="mb-3"
+                        >
+                            Create Product
+                        </Button>
+                        <Table
+                            dataSource={products}
+                            columns={columns}
+                            rowKey="_id"
+                            pagination={{ pageSize: 5 }}
+                        />
+                        <ProductModal
+                            visible={isModalVisible}
+                            onCancel={() => {
+                                setIsModalVisible(false);
+                                setSelectedProduct(null);
+                            }}
+                            onSuccess={getProducts}
+                            initialData={selectedProduct}
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

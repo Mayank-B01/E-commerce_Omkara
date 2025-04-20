@@ -5,9 +5,9 @@ import '../styles/About.css';
 import founderImage from '../assets/women-category.png';
 import omkaraLogo from '../assets/omkara-logo.jpg';
 
-const About = () => {
+const About = ({ handleShowAuthModal }) => {
     return (
-        <Layout title={'About Us - Omkara'}>
+        <Layout title={'About Us - Omkara'} handleShowAuthModal={handleShowAuthModal}>
             <div className="about-container">
                 {/* Breadcrumb Removed */}
                 {/* <div className="breadcrumb">

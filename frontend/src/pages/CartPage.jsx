@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout/Layout.jsx';
 import { useCart } from '../context/cart.jsx'; // Assuming cart context exists
 import { useAuth } from '../context/auth.jsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import axios from 'axios'; // Import axios for API calls
 import '../styles/CartPage.css'; // Import custom CSS for styling
 
-const CartPage = () => {
+const CartPage = ({ handleShowAuthModal }) => {
     const [auth, setAuth] = useAuth();
     const [cart, setCart] = useCart();
     const navigate = useNavigate();
+    const location = useLocation(); // Hook to get location object
+    const [isProcessing, setIsProcessing] = useState(false); // Add loading state
 
     // Calculate Total Price
     const totalPrice = () => {
@@ -67,8 +70,96 @@ const CartPage = () => {
         }
     };
 
+    // Effect to check for payment status on load/redirect
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const paymentStatus = queryParams.get('payment_status');
+        const orderId = queryParams.get('orderId');
+        const message = queryParams.get('message');
+        const status = queryParams.get('status'); // For specific statuses like 'PaymentNotCompleted'
+
+        if (paymentStatus === 'failure') {
+            let displayMessage = "Payment Failed or Cancelled."; // Default
+            if (message === 'PaymentFailedOrCancelled') displayMessage = "Your payment attempt failed or was cancelled.";
+            else if (message === 'SignatureMismatch') displayMessage = "Payment verification failed due to a security issue.";
+            else if (message === 'PaymentNotCompleted') displayMessage = `The payment process was not completed (Status: ${status || 'N/A'}).`;
+            else if (message === 'InvalidCallbackResponse' || message === 'InvalidCallbackDataFormat') displayMessage = "Error receiving payment confirmation.";
+            else if (message === 'ServerError') displayMessage = "A server error occurred during payment confirmation.";
+            // Add more specific messages if needed
+
+            toast.error(`Payment Failed: ${displayMessage}${orderId && orderId !== 'UNKNOWN' ? ` (Order ID: ${orderId})` : ''}`);
+            // Remove query parameters from URL without reloading page
+            navigate('/cart', { replace: true });
+        }
+
+        // Clear success parameters if user navigates back here after success on homepage
+        if (paymentStatus === 'success' || paymentStatus === 'success_db_error'){
+             navigate('/cart', { replace: true });
+        }
+
+    }, [location, navigate]); // Re-run effect if location changes
+
+    // Handle eSewa Checkout - UPDATED
+    const handleEsewaCheckout = async () => {
+        if (isProcessing) return; // Prevent double clicks
+        setIsProcessing(true);
+        toast.info("Initiating payment process...");
+
+        try {
+            // 1. Prepare payment data
+            const orderAmount = parseFloat(totalPrice().replace(/[^\d.-]/g,"")); // Extract number
+            // Generate a more robust unique Order ID
+            const uniqueOrderId = `OMK-${Date.now()}-${auth.user?._id?.slice(-4) || 'GUEST'}`;
+
+            if (orderAmount <= 0) {
+                toast.error("Cannot process payment with zero or negative amount.");
+                setIsProcessing(false);
+                return;
+            }
+
+            console.log(`[Frontend Checkout] Initiating payment for Order ID: ${uniqueOrderId}, Amount: ${orderAmount}`);
+
+            // 2. Call backend to initiate payment
+            const { data } = await axios.post(
+                `${import.meta.env.VITE_API}/api/v1/esewa/initiate`, // Correct backend route
+                {
+                    amount: orderAmount,
+                    orderId: uniqueOrderId,
+                    // Optionally send cart details if needed for pre-saving order on backend
+                    // cartItems: cart.map(item => ({ product: item._id, quantity: item.quantity, size: item.selectedSize }))
+                },
+                {
+                    headers: {
+                         // Add "Bearer " prefix before the token
+                        Authorization: `Bearer ${auth?.token}` 
+                    }
+                }
+            );
+
+            // 3. Handle backend response
+            if (data?.success && data?.url) {
+                console.log("[Frontend Checkout] Received redirect URL from backend. Redirecting...");
+                toast.success("Redirecting to eSewa for payment...");
+                // Redirect the user to the eSewa payment page URL provided by the backend
+                window.location.href = data.url;
+            } else {
+                console.error("[Frontend Checkout] Failed to initiate eSewa payment:", data?.message);
+                toast.error(data?.message || "Failed to start eSewa payment process. Please try again.");
+                setIsProcessing(false);
+            }
+
+        } catch (error) {
+            console.error("[Frontend Checkout] Error initiating eSewa payment:", error);
+            const errorMsg = error.response?.data?.message || "An error occurred during checkout. Please check console and try again.";
+            toast.error(errorMsg);
+            setIsProcessing(false);
+        }
+        // Note: setIsProcessing(false) is handled within success/error paths above
+        // No need to set it here unless the redirect fails instantly (unlikely)
+    };
+
     return (
-        <Layout title={"Your Cart - Omkara"}>
+        <Layout title={"Your Cart - Omkara"} handleShowAuthModal={handleShowAuthModal}>
             <div className="container cart-page-container mt-4">
                 <div className="row">
                     <div className="col-12">
@@ -96,11 +187,8 @@ const CartPage = () => {
                                 </div>
                                 <div className="col-md-9">
                                     <h5>{p.name}</h5>
-                                    {/* Display size if available */} 
                                     {p.selectedSize && <p className="mb-1"><small>Size: {p.selectedSize}</small></p>} 
-                                    {/* Display quantity - Adjust if editable */}
                                     <p className="mb-1">Quantity: {p.quantity || 1}</p> 
-                                    {/* Quantity Changer - Uncomment and adapt if needed */}
                                     <div className="d-flex align-items-center mb-2">
                                         <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => handleQuantityChange(p._id, p.selectedSize, (p.quantity || 1) - 1)}>-</button>
                                         <span>{p.quantity || 1}</span>
@@ -158,12 +246,13 @@ const CartPage = () => {
                                 </div>
                             )}
                             <div className="d-grid gap-2">
-                                <button 
-                                    className="btn btn-success" 
-                                    disabled={!auth?.token || !auth?.user?.address /* Add payment setup check later */} 
-                                    /* Add onClick for payment processing */
+                                <button
+                                    className="btn btn-success"
+                                    onClick={handleEsewaCheckout}
+                                    // Disable button if processing, not logged in, no address, or cart empty
+                                    disabled={isProcessing || !auth?.token || !auth?.user?.address || cart?.length === 0}
                                 >
-                                    Proceed to Checkout
+                                    {isProcessing ? "Processing..." : "Proceed to Checkout (eSewa)"}
                                 </button>
                                 <button 
                                     className="btn btn-outline-secondary mt-2" 

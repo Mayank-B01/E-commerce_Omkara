@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { useCart } from "../context/cart.jsx";
 import '../styles/ProductDetails.css';
 
-const ProductDetails = () => {
+const ProductDetails = ({ handleShowAuthModal }) => {
     const params = useParams();
     const navigate = useNavigate();
     const [cart, setCart] = useCart();
@@ -80,7 +80,7 @@ const ProductDetails = () => {
     };
 
     return (
-        <Layout title={`${product?.name || 'Product Details'} - Omkara`}>
+        <Layout title={product?.name || 'Product Details'} handleShowAuthModal={handleShowAuthModal}>
             <div className="container mt-4 product-details-container">
                  {/* Breadcrumbs Removed */}
                  {/* <nav aria-label="breadcrumb" className="mb-3">

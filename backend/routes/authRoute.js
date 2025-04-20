@@ -5,10 +5,13 @@ const {
     testController,
     forgotPassController,
     updateProfileController,
-    updatePasswordController
+    updatePasswordController,
+    userCount,
+    productCount,
+    getAllUsersController,
+    deleteUserController
 } = require('../controllers/authController.js');
 const { requireSignIn, isAdmin } = require('../middlewares/authMiddleware.js');
-const { userCount, productCount } = require("../controllers/authController");
 const router = express.Router();
 
 // Register route
@@ -38,6 +41,12 @@ router.put('/profile', requireSignIn, updateProfileController);
 
 // Update Password
 router.put('/update-password', requireSignIn, updatePasswordController);
+
+// Get all users (Admin Only)
+router.get('/all-users', requireSignIn, isAdmin, getAllUsersController);
+
+// Delete user (Admin Only)
+router.delete('/delete-user/:userId', requireSignIn, isAdmin, deleteUserController);
 
 //get user count
 router.get('/count', requireSignIn, isAdmin, userCount);

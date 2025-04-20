@@ -151,18 +151,18 @@ const Register = ({ handleShowLogin }) => {
                             Sign Up
                         </button>
 
-                        {/* OR Divider */}
-                        <div className="d-flex align-items-center mb-3">
-                            <hr className="flex-grow-1"/>
-                            <span className="mx-2">OR</span>
-                            <hr className="flex-grow-1"/>
-                        </div>
+                        {/*/!* OR Divider *!/*/}
+                        {/*<div className="d-flex align-items-center mb-3">*/}
+                        {/*    <hr className="flex-grow-1"/>*/}
+                        {/*    <span className="mx-2">OR</span>*/}
+                        {/*    <hr className="flex-grow-1"/>*/}
+                        {/*</div>*/}
 
-                        {/* Continue with Google Button */}
-                        <button type="button" className="btn btn-danger w-100 mb-2">
-                            <FaGoogle className="me-2"/>
-                            Continue With Google
-                        </button>
+                        {/*/!* Continue with Google Button *!/*/}
+                        {/*<button type="button" className="btn btn-danger w-100 mb-2">*/}
+                        {/*    <FaGoogle className="me-2"/>*/}
+                        {/*    Continue With Google*/}
+                        {/*</button>*/}
 
                         {/* Login Link */}
                         <div className="text-center mb-2">

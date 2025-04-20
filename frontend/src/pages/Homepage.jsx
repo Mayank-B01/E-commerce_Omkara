@@ -10,7 +10,7 @@ import accessoriesCategory from '../assets/accessories-category.jpg';
 import { useCart } from "../context/cart.jsx";
 import { toast } from 'react-toastify';
 
-const Homepage = () => {
+const Homepage = ({ handleShowAuthModal }) => {
     const [auth] = useAuth();
     const navigate = useNavigate();
     const [cart, setCart] = useCart();
@@ -58,7 +58,7 @@ const Homepage = () => {
     }, []);
 
     return (
-        <Layout title={'Omkara - Home'}>
+        <Layout title={'Omkara - Home'} handleShowAuthModal={handleShowAuthModal}>
             {/* Hero Section */}
             <section className="hero-section">
                 <div className="hero-content">

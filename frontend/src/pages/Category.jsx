@@ -10,7 +10,7 @@ import { useCart } from "../context/cart.jsx"; // Import useCart
 // Static sizes for now
 const Sizes = ["S", "M", "L", "XL", "XXL"];
 
-const Category = () => {
+const Category = ({ handleShowAuthModal }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [auth, setAuth] = useAuth();
@@ -197,7 +197,7 @@ const Category = () => {
     }
 
     return(
-        <Layout title={'Omkara - Products'}>
+        <Layout title={'Omkara - Products'} handleShowAuthModal={handleShowAuthModal}>
             <div className="container-fluid row mt-3">
                 {/* Breadcrumb or Title Removed */}
                 {/* <div className="col-md-12 mb-3">

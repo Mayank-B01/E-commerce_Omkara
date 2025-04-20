@@ -6,8 +6,9 @@ import { useAuth } from '../../context/auth.jsx';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import '../../styles/UserDashboard.css'; // Import the new CSS
+// import '../../styles/OrderHistory.css'; // Specific styling for order history
 
-const UserOrder = () => {
+const UserOrder = ({ handleShowAuthModal }) => {
     const [orders, setOrders] = useState([]);
     const [auth] = useAuth();
 
@@ -26,8 +27,8 @@ const UserOrder = () => {
     }, [auth?.token]);
 
     return (
-        <Layout title={"Your Orders - Omkara"}>
-            <div className="dashboard-container">
+        <Layout title={"Order History - Omkara"} handleShowAuthModal={handleShowAuthModal}>
+            <div className="dashboard-container order-history-container">
                 <div className="dashboard-menu">
                     <UserMenu />
                 </div>

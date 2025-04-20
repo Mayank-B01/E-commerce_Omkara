@@ -294,4 +294,93 @@ const updatePasswordController = async (req, res) => {
     }
 };
 
-module.exports = {registerController, loginController, testController, forgotPassController, userCount, productCount, updateProfileController, updatePasswordController};
+// Controller to get all users (Admin only), optionally filtered by role
+const getAllUsersController = async (req, res) => {
+    try {
+        // Build filter object based on query parameter
+        const filter = {};
+        if (req.query.role) {
+            const role = parseInt(req.query.role, 10);
+            // Basic validation: ensure role is 0 or 1
+            if (!isNaN(role) && (role === 0 || role === 1)) {
+                filter.role = role;
+            } else {
+                // Optional: Handle invalid role query param, e.g., return error or ignore
+                console.log(`Invalid role query parameter received: ${req.query.role}. Fetching all users.`);
+                // Or: return res.status(400).send({ success: false, message: "Invalid role specified" });
+            }
+        }
+
+        // Find users based on filter, exclude password field
+        console.log("Fetching users with filter:", filter); // Log the filter being used
+        const users = await userModel.find(filter).select("-password");
+
+        res.status(200).send({
+            success: true,
+            message: `Users ${Object.keys(filter).length > 0 ? 'filtered by role ' + filter.role : ''} fetched successfully`,
+            count: users.length,
+            users: users,
+        });
+    } catch (error) {
+        console.log("Error fetching all users:", error);
+        res.status(500).send({
+            success: false,
+            message: "Error fetching users",
+            error: error.message,
+        });
+    }
+};
+
+// Controller to delete a user (Admin only)
+const deleteUserController = async (req, res) => {
+    try {
+        const userIdToDelete = req.params.userId;
+        const currentAdminId = req.user.id; // From requireSignIn middleware
+
+        // Prevent self-deletion
+        if (userIdToDelete === currentAdminId) {
+            return res.status(403).send({
+                success: false,
+                message: "Admin cannot delete their own account.",
+            });
+        }
+
+        // Find and delete the user
+        const deletedUser = await userModel.findByIdAndDelete(userIdToDelete);
+
+        if (!deletedUser) {
+            return res.status(404).send({
+                success: false,
+                message: "User not found for deletion.",
+            });
+        }
+
+        res.status(200).send({
+            success: true,
+            message: `User "${deletedUser.name}" deleted successfully`,
+            deletedUser: { // Optionally return basic info of deleted user
+                _id: deletedUser._id,
+                name: deletedUser.name,
+                email: deletedUser.email
+            }
+        });
+
+    } catch (error) {
+        console.log("Error deleting user:", error);
+        // Handle potential CastError if userIdToDelete format is invalid
+        if (error.name === 'CastError') {
+             return res.status(400).send({
+                success: false,
+                message: "Invalid user ID format.",
+                error: error.message,
+            });
+        }
+        res.status(500).send({
+            success: false,
+            message: "Error deleting user",
+            error: error.message,
+        });
+    }
+};
+
+module.exports = {registerController, loginController, testController, forgotPassController, userCount, productCount, updateProfileController, updatePasswordController, getAllUsersController, deleteUserController};

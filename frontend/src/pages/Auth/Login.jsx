@@ -3,11 +3,14 @@ import {Col, Row} from "react-bootstrap";
 import {toast} from "react-toastify";
 import {useAuth} from "../../context/auth.jsx";
 import axios from "axios";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthModal}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [auth,setAuth] = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const handleSubmit = async (e) =>{
         e.preventDefault();
@@ -18,15 +21,24 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
             });
             if (res.data.success) {
                 toast.success(res.data.message);
+                const userData = res.data.user;
+                const tokenData = res.data.token;
+                
                 setAuth({
                     ...auth,
-                    user:res.data.user,
-                    token:res.data.token
-                })
-                localStorage.setItem('auth', JSON.stringify(res.data))
-                setTimeout(() => {
-                    handleCloseAuthModal(); 
-                }, 100);
+                    user: userData,
+                    token: tokenData
+                });
+                localStorage.setItem('auth', JSON.stringify({ user: userData, token: tokenData }));
+
+                if (userData.role === 1) {
+                    navigate('/dashboard/admin');
+                } else {
+                    const from = location.state?.from?.pathname || "/";
+                    navigate(from);
+                }
+                
+                handleCloseAuthModal();
             }
             else{
                 toast.error(res.data.message);

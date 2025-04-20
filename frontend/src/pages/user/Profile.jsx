@@ -6,7 +6,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../../styles/UserDashboard.css'; // Import the new CSS
 
-const Profile = () => {
+const Profile = ({ handleShowAuthModal }) => {
     const [auth, setAuth] = useAuth();
     // State for user details
     const [firstName, setFirstName] = useState('');
@@ -21,12 +21,13 @@ const Profile = () => {
 
     // Populate form with user data on load
     useEffect(() => {
+        // Reverted: Expects auth.user to have: name, email, phone
         const { name, email, phone } = auth?.user || {};
         // Basic name splitting, adjust if your data structure is different
         const nameParts = name?.split(' ') || [];
         setFirstName(nameParts[0] || '');
         setLastName(nameParts.slice(1).join(' ') || '');
-        setDisplayName(name || '');
+        setDisplayName(name || ''); // Set display name from the full name for now
         setEmail(email || '');
         setPhone(phone || '');
     }, [auth?.user]);
@@ -34,13 +35,14 @@ const Profile = () => {
     // Handle profile details update
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
+        // Reverted: Combine first and last name
         const fullName = `${firstName} ${lastName}`.trim();
         try {
+            // Reverted: Send combined 'name', email, phone
             const { data } = await axios.put(`${import.meta.env.VITE_API}/api/v1/auth/profile`, {
-                name: fullName, // Combine first and last name
-                email,        // Email update might be restricted depending on setup
+                name: fullName, 
+                email,        
                 phone,
-                // Exclude password fields here
             });
             if (data?.error) {
                 toast.error(data.error);
@@ -106,8 +108,8 @@ const Profile = () => {
 
 
     return (
-        <Layout title={"Account Info - Omkara"}>
-            <div className="dashboard-container">
+        <Layout title={"Account Info - Omkara"} handleShowAuthModal={handleShowAuthModal}>
+            <div className="dashboard-container profile-container">
                 <div className="dashboard-menu">
                     <UserMenu />
                 </div>

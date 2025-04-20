@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import Layout from "../components/Layout/Layout.jsx";
 import { Link } from 'react-router-dom';
 import '../styles/Contact.css';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
-const Contact = () => {
+const Contact = ({ handleShowAuthModal }) => {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -49,7 +51,7 @@ const Contact = () => {
     };
 
     return (
-        <Layout title={'Contact Us - Omkara'}>
+        <Layout title={'Contact Us - Omkara'} handleShowAuthModal={handleShowAuthModal}>
             <div className="contact-container">
                 {/* Breadcrumb Navigation */}
                 {/* <div className="breadcrumb">

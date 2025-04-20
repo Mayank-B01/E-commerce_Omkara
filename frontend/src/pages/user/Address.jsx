@@ -5,9 +5,10 @@ import { useAuth } from '../../context/auth.jsx';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../../styles/UserDashboard.css';
+// import '../../styles/Address.css';
 import { FaPencilAlt } from 'react-icons/fa';
 
-const Address = () => {
+const Address = ({ handleShowAuthModal }) => {
     const [auth, setAuth] = useAuth();
     const [address, setAddress] = useState('');
     const [isEditing, setIsEditing] = useState(false);
@@ -42,8 +43,8 @@ const Address = () => {
     };
 
     return (
-        <Layout title={"Manage Address - Omkara"}>
-            <div className="dashboard-container">
+        <Layout title={"Manage Address - Omkara"} handleShowAuthModal={handleShowAuthModal}>
+            <div className="dashboard-container address-container">
                 <div className="dashboard-menu">
                     <UserMenu />
                 </div>

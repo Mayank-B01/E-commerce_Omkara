@@ -5,7 +5,7 @@ import UserMenu from "../../components/Layout/UserMenu.jsx";
 import {useAuth} from "../../context/auth.jsx";
 import '../../styles/UserDashboard.css';
 
-const Dashboard = () =>{
+const Dashboard = ({ handleShowAuthModal }) =>{
     const [auth] = useAuth();
 
     // Helper function to format the date
@@ -16,7 +16,7 @@ const Dashboard = () =>{
     };
 
     return(
-        <Layout title={'Dashboard - Omkara'}>
+        <Layout title={'Dashboard - Omkara'} handleShowAuthModal={handleShowAuthModal}>
             <div className="dashboard-container">
                 <div className="dashboard-menu">
                     <UserMenu />
