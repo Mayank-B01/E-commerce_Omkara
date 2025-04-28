@@ -150,27 +150,29 @@ const OrderPage = () => {
                                                             </Select>
                                                         </td>
                                                         <td>{o?.buyer?.name}</td>
-                                                        <td>{moment(o?.createdAt).fromNow()}</td>
-                                                        <td>{o?.payment?.success ? "Success" : "Failed"}</td>
+                                                        <td>{moment(o?.createdAt).format('DD MMM, YYYY HH:mm')}</td>
+                                                        <td>{o?.payment?.status === 'COMPLETE' ? "Success" : (o?.payment?.status || "Failed/Pending")}</td>
                                                         <td>{o?.products?.length}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                             <div className="container">
                                                 <h6>Order Items:</h6>
-                                                {o?.products?.map((p) => (
-                                                    <div className="row mb-2 p-2 card flex-row align-items-center" key={p._id}>
+                                                {o?.products?.map((item) => (
+                                                    <div className="row mb-2 p-2 card flex-row align-items-center" key={item.product?._id || item._id}>
                                                         <div className="col-md-2">
                                                             <img
-                                                                src={`${import.meta.env.VITE_API}/api/v1/product/product-photo/${p._id}`}
+                                                                src={`${import.meta.env.VITE_API}/api/v1/product/product-photo/${item.product?._id}`}
                                                                 className="img-fluid rounded"
-                                                                alt={p.name}
+                                                                alt={item.product?.name}
                                                                 style={{maxHeight: '80px'}}
                                                             />
                                                         </div>
                                                         <div className="col-md-8">
-                                                            <p className="mb-1">{p.name}</p>
-                                                            <p className="mb-1">Rs. {p.price}</p>
+                                                            <p className="mb-1">{item.product?.name}</p>
+                                                            {item.size && <p className="mb-1"><small>Size: {item.size}</small></p>}
+                                                            <p className="mb-1"><small>Quantity: {item.quantity}</small></p>
+                                                            <p className="mb-1">Price: Rs. {item.product?.price}</p>
                                                         </div>
                                                     </div>
                                                 ))}

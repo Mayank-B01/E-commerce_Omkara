@@ -4,11 +4,13 @@ import axios from 'axios';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useCart } from "../context/cart.jsx";
+import { useAuth } from "../context/auth.jsx";
 import '../styles/ProductDetails.css';
 
 const ProductDetails = ({ handleShowAuthModal }) => {
     const params = useParams();
     const navigate = useNavigate();
+    const [auth] = useAuth();
     const [cart, setCart] = useCart();
     const [product, setProduct] = useState({});
     const [relatedProducts, setRelatedProducts] = useState([]);
@@ -64,16 +66,73 @@ const ProductDetails = ({ handleShowAuthModal }) => {
     const handleDecrement = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
 
     // Add to Cart Handler
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (!selectedSize && product?.sizes?.length > 0) {
             toast.error("Please select a size");
             return;
         }
 
-        const updatedCart = [...cart, { ...product, selectedSize, quantity }];
-        setCart(updatedCart);
-        localStorage.setItem('cart', JSON.stringify(updatedCart));
-        toast.success('Item added to cart!');
+        const cartItem = {
+            productId: product._id,
+            quantity: quantity,
+            size: selectedSize,
+            _id: product._id,
+            name: product.name,
+            price: product.price,
+            selectedSize: selectedSize
+        };
+
+        if (auth?.token) {
+            // User is logged in - Call Backend API
+            try {
+                const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/cart/add`,
+                    {
+                        productId: cartItem.productId,
+                        quantity: cartItem.quantity,
+                        size: cartItem.size
+                    },
+                    {
+                         headers: {
+                            Authorization: `Bearer ${auth.token}`
+                         }
+                    }
+                );
+
+                if (data?.success) {
+                    toast.success('Item added to cart!');
+                    const existingItemIndex = cart.findIndex(item => item.product?._id === cartItem.productId && item.size === cartItem.size);
+                    if (existingItemIndex > -1) {
+                        const updatedCart = [...cart];
+                        updatedCart[existingItemIndex].quantity += cartItem.quantity;
+                        setCart(updatedCart);
+                    } else {
+                        setCart([...cart, { product: { ...product, _id: cartItem.productId }, quantity: cartItem.quantity, size: cartItem.size }]);
+                    }
+                } else {
+                    toast.error(data?.message || "Failed to add item to cart.");
+                }
+            } catch (error) {
+                console.error("Error adding item via API:", error);
+                toast.error(error.response?.data?.message || "Error adding item to cart.");
+            }
+        } else {
+            // User not logged in - Use Local Storage
+            const existingCartItemIndex = cart.findIndex(item => item._id === cartItem._id && item.selectedSize === cartItem.selectedSize);
+            let updatedCart;
+
+            if (existingCartItemIndex > -1) {
+                // Item (with same size) exists, update quantity
+                updatedCart = [...cart];
+                updatedCart[existingCartItemIndex].quantity += cartItem.quantity;
+            } else {
+                // Add new item
+                 updatedCart = [...cart, cartItem];
+            }
+
+            setCart(updatedCart);
+            localStorage.setItem('cart', JSON.stringify(updatedCart));
+            toast.success('Item added to cart!');
+        }
     };
 
     return (
@@ -140,7 +199,15 @@ const ProductDetails = ({ handleShowAuthModal }) => {
                             <button className="btn btn-dark flex-grow-1 me-2" onClick={handleAddToCart}>
                                 <i className="bi bi-cart-plus-fill me-1"></i> Add to Cart
                             </button>
-                            <button className="btn btn-outline-success flex-grow-1" /* Changed to outline-success */ >
+                            <button 
+                                className="btn btn-outline-success flex-grow-1" 
+                                onClick={async () => {
+                                    // First, add the item to cart using the existing logic
+                                    await handleAddToCart(); 
+                                    // Then navigate to the cart page
+                                    navigate('/cart'); 
+                                }}
+                            >
                                 <i className="bi bi-bag-check-fill me-1"></i> Buy Now
                             </button>
                         </div>
@@ -182,10 +249,55 @@ const ProductDetails = ({ handleShowAuthModal }) => {
                                         <button
                                             className='btn btn-sm btn-dark ms-1'
                                             onClick={() => {
-                                                const updatedCart = [...cart, p]; 'p'
-                                                setCart(updatedCart);
-                                                localStorage.setItem('cart', JSON.stringify(updatedCart));
-                                                toast.success('Item added to cart!');
+                                                const relatedCartItem = {
+                                                    productId: p._id,
+                                                    quantity: 1,
+                                                    size: p.sizes?.length > 0 ? p.sizes[0] : null,
+                                                    _id: p._id,
+                                                    name: p.name,
+                                                    price: p.price,
+                                                    selectedSize: p.sizes?.length > 0 ? p.sizes[0] : null
+                                                };
+
+                                                if (auth?.token) {
+                                                    const addToCartApi = async () => {
+                                                         try {
+                                                            const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/cart/add`,
+                                                                { productId: relatedCartItem.productId, quantity: relatedCartItem.quantity, size: relatedCartItem.size },
+                                                                { headers: { Authorization: `Bearer ${auth.token}` } }
+                                                            );
+                                                            if (data?.success) {
+                                                                toast.success('Item added to cart!');
+                                                                const existingItemIndex = cart.findIndex(item => item.product?._id === relatedCartItem.productId && item.size === relatedCartItem.size);
+                                                                if (existingItemIndex > -1) {
+                                                                    const updatedCart = [...cart];
+                                                                    updatedCart[existingItemIndex].quantity += relatedCartItem.quantity;
+                                                                    setCart(updatedCart);
+                                                                } else {
+                                                                    setCart([...cart, { product: { ...p, _id: relatedCartItem.productId }, quantity: relatedCartItem.quantity, size: relatedCartItem.size }]);
+                                                                }
+                                                            } else {
+                                                                toast.error(data?.message || "Failed to add item.");
+                                                            }
+                                                        } catch (error) {
+                                                            toast.error(error.response?.data?.message || "Error adding item.");
+                                                            console.error("Error adding related item via API:", error);
+                                                        }
+                                                    };
+                                                    addToCartApi();
+                                                } else {
+                                                    const existingCartItemIndex = cart.findIndex(item => item._id === relatedCartItem._id && item.selectedSize === relatedCartItem.selectedSize);
+                                                    let updatedCart;
+                                                    if (existingCartItemIndex > -1) {
+                                                        updatedCart = [...cart];
+                                                        updatedCart[existingCartItemIndex].quantity += relatedCartItem.quantity;
+                                                    } else {
+                                                        updatedCart = [...cart, relatedCartItem];
+                                                    }
+                                                    setCart(updatedCart);
+                                                    localStorage.setItem('cart', JSON.stringify(updatedCart));
+                                                    toast.success('Item added to cart!');
+                                                }
                                             }}
                                         >
                                             Add to Cart <i className="bi bi-cart-plus-fill"></i>

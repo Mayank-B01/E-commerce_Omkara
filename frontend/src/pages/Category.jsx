@@ -13,7 +13,7 @@ const Sizes = ["S", "M", "L", "XL", "XXL"];
 const Category = ({ handleShowAuthModal }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [auth, setAuth] = useAuth();
+    const [auth] = useAuth();
     const [cart, setCart] = useCart(); // Use cart context
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -287,11 +287,53 @@ const Category = ({ handleShowAuthModal }) => {
                                     </button>
                                     <button
                                         className='btn btn-sm btn-dark ms-1'
-                                        onClick={() => {
-                                            const updatedCart = [...cart, { ...p, quantity: 1 }]; 
-                                            setCart(updatedCart);
-                                            localStorage.setItem('cart', JSON.stringify(updatedCart));
-                                            toast.success('Item added to cart!');
+                                        onClick={async () => {
+                                            const cartItem = {
+                                                productId: p._id,
+                                                quantity: 1,
+                                                size: p.sizes?.length > 0 ? p.sizes[0] : null,
+                                                _id: p._id,
+                                                name: p.name,
+                                                price: p.price,
+                                                selectedSize: p.sizes?.length > 0 ? p.sizes[0] : null
+                                            };
+
+                                            if (auth?.token) {
+                                                try {
+                                                    const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/cart/add`,
+                                                        { productId: cartItem.productId, quantity: cartItem.quantity, size: cartItem.size },
+                                                        { headers: { Authorization: `Bearer ${auth.token}` } }
+                                                    );
+                                                    if (data?.success) {
+                                                        toast.success('Item added to cart!');
+                                                        const existingItemIndex = cart.findIndex(item => item.product?._id === cartItem.productId && item.size === cartItem.size);
+                                                         if (existingItemIndex > -1) {
+                                                             const updatedCart = [...cart];
+                                                             updatedCart[existingItemIndex].quantity += cartItem.quantity;
+                                                             setCart(updatedCart);
+                                                         } else {
+                                                             setCart([...cart, { product: { ...p, _id: cartItem.productId }, quantity: cartItem.quantity, size: cartItem.size }]);
+                                                         }
+                                                    } else {
+                                                        toast.error(data?.message || "Failed to add item.");
+                                                    }
+                                                } catch (error) {
+                                                    toast.error(error.response?.data?.message || "Error adding item.");
+                                                    console.error("Error adding item via API:", error);
+                                                }
+                                            } else {
+                                                const existingCartItemIndex = cart.findIndex(item => item._id === cartItem._id && item.selectedSize === cartItem.selectedSize);
+                                                let updatedCart;
+                                                if (existingCartItemIndex > -1) {
+                                                    updatedCart = [...cart];
+                                                    updatedCart[existingCartItemIndex].quantity += cartItem.quantity;
+                                                } else {
+                                                    updatedCart = [...cart, cartItem];
+                                                }
+                                                setCart(updatedCart);
+                                                localStorage.setItem('cart', JSON.stringify(updatedCart));
+                                                toast.success('Item added to cart!');
+                                            }
                                         }}
                                     >
                                         Add to Cart <i className="bi bi-cart-plus-fill"></i>

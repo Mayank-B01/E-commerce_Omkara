@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from "../components/Layout/Layout.jsx";
 import { useAuth } from "../context/auth.jsx";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Homepage.css';
 import axios from 'axios';
 import menCategory from '../assets/men-category.png';
@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 const Homepage = ({ handleShowAuthModal }) => {
     const [auth] = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [cart, setCart] = useCart();
     const [products, setProducts] = useState([]);
     const [trendingProducts, setTrendingProducts] = useState([]);
@@ -55,7 +56,27 @@ const Homepage = ({ handleShowAuthModal }) => {
 
     useEffect(() => {
         getAllProducts();
-    }, []);
+
+        // Check for payment success status on mount
+        const queryParams = new URLSearchParams(location.search);
+        const paymentStatus = queryParams.get('payment_status');
+        const orderId = queryParams.get('orderId'); // Optional: use if needed
+
+        if (paymentStatus === 'success') {
+            toast.success(`Payment successful! ${orderId ? `(Order: ${orderId})` : ''}`);
+            // Optionally clear cart context explicitly, though CartProvider should refetch the empty cart
+            // setCart([]); 
+            // Clear query parameters from URL
+            navigate('/', { replace: true });
+        } else if (paymentStatus === 'success_db_error') {
+            // Handle case where payment was ok but order saving failed
+            toast.error(`Payment was successful, but there was an issue saving your order. Please contact support. ${orderId ? `(Order: ${orderId})` : ''}`);
+            navigate('/', { replace: true });
+        }
+        // No need to handle failure here, as the backend redirects to /cart?payment_status=failure...
+        // and CartPage.jsx handles displaying failure messages
+
+    }, []); // Run only once on mount
 
     return (
         <Layout title={'Omkara - Home'} handleShowAuthModal={handleShowAuthModal}>
@@ -140,11 +161,53 @@ const Homepage = ({ handleShowAuthModal }) => {
                             </button>
                             <button
                                 className='btn btn-sm btn-dark ms-1'
-                                onClick={() => {
-                                    const updatedCart = [...cart, { ...product, quantity: 1 }];
-                                    setCart(updatedCart);
-                                    localStorage.setItem('cart', JSON.stringify(updatedCart));
-                                    toast.success('Item added to cart!');
+                                onClick={async () => {
+                                    const cartItem = {
+                                        productId: product._id,
+                                        quantity: 1,
+                                        size: product.sizes?.length > 0 ? product.sizes[0] : null,
+                                        _id: product._id,
+                                        name: product.name,
+                                        price: product.price,
+                                        selectedSize: product.sizes?.length > 0 ? product.sizes[0] : null
+                                    };
+
+                                    if (auth?.token) {
+                                        try {
+                                            const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/cart/add`,
+                                                { productId: cartItem.productId, quantity: cartItem.quantity, size: cartItem.size },
+                                                { headers: { Authorization: `Bearer ${auth.token}` } }
+                                            );
+                                            if (data?.success) {
+                                                toast.success('Item added to cart!');
+                                                const existingItemIndex = cart.findIndex(item => item.product?._id === cartItem.productId && item.size === cartItem.size);
+                                                if (existingItemIndex > -1) {
+                                                    const updatedCart = [...cart];
+                                                    updatedCart[existingItemIndex].quantity += cartItem.quantity;
+                                                    setCart(updatedCart);
+                                                } else {
+                                                    setCart([...cart, { product: { ...product, _id: cartItem.productId }, quantity: cartItem.quantity, size: cartItem.size }]);
+                                                }
+                                            } else {
+                                                toast.error(data?.message || "Failed to add item.");
+                                            }
+                                        } catch (error) {
+                                            toast.error(error.response?.data?.message || "Error adding item.");
+                                            console.error("Error adding item via API:", error);
+                                        }
+                                    } else {
+                                        const existingCartItemIndex = cart.findIndex(item => item._id === cartItem._id && item.selectedSize === cartItem.selectedSize);
+                                        let updatedCart;
+                                        if (existingCartItemIndex > -1) {
+                                            updatedCart = [...cart];
+                                            updatedCart[existingCartItemIndex].quantity += cartItem.quantity;
+                                        } else {
+                                            updatedCart = [...cart, cartItem];
+                                        }
+                                        setCart(updatedCart);
+                                        localStorage.setItem('cart', JSON.stringify(updatedCart));
+                                        toast.success('Item added to cart!');
+                                    }
                                 }}
                             >
                                 Add to Cart <i className="bi bi-cart-plus-fill"></i>

@@ -2,6 +2,7 @@ import React,{useState} from 'react';
 import {Col, Row} from "react-bootstrap";
 import {toast} from "react-toastify";
 import {useAuth} from "../../context/auth.jsx";
+import { useCart } from "../../context/cart.jsx";
 import axios from "axios";
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -9,6 +10,7 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [auth,setAuth] = useAuth();
+    const [cart, setCart] = useCart();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -23,6 +25,7 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
                 toast.success(res.data.message);
                 const userData = res.data.user;
                 const tokenData = res.data.token;
+                const cartData = res.data.cart || [];
                 
                 setAuth({
                     ...auth,
@@ -30,6 +33,9 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
                     token: tokenData
                 });
                 localStorage.setItem('auth', JSON.stringify({ user: userData, token: tokenData }));
+                
+                setCart(cartData);
+                localStorage.removeItem('cart');
 
                 if (userData.role === 1) {
                     navigate('/dashboard/admin');

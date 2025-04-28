@@ -10,8 +10,13 @@ const getAllOrdersController = async (req, res) => {
         console.log("Fetching orders with filter:", filter);
         
         const orders = await Order.find(filter)
-            .populate("products", "-photo")
-            .populate("buyer", "name email")
+            // Populate nested product details
+            .populate({ 
+                path: 'products.product', 
+                select: 'name price slug' // Select needed product fields
+            })
+            .populate("buyer", "name email") // Populate buyer
+            // .populate("payment") // Populate payment details (Not needed, payment is embedded, not referenced)
             .sort({ createdAt: -1 });
 
         res.status(200).send({
@@ -65,11 +70,17 @@ const updateOrderStatusController = async (req, res) => {
 
 const getOrderStatsController = async (req, res) => {
     try {
-        const count = await Order.countDocuments({}); // Example: count all orders
+        const count = await Order.countDocuments({}); // Get total order count
+        
+        // Calculate revenue based on orders with successful payment
         const revenueResult = await Order.aggregate([
-            { $match: { status: 'Delivered' } }, // Example: only count delivered for revenue
-            { $group: { _id: null, totalRevenue: { $sum: '$payment.transaction.amount' } } } 
+            { $match: { 'payment.status': 'COMPLETE' } }, // Match orders with successful payment
+            { $group: { 
+                _id: null, // Group all matched documents together
+                totalRevenue: { $sum: '$payment.amount' } // Sum the payment amount field
+            } } 
         ]);
+        // Extract totalRevenue, default to 0 if no successful orders found
         const totalRevenue = revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;
 
         res.status(200).json({ count, totalRevenue });
@@ -79,8 +90,36 @@ const getOrderStatsController = async (req, res) => {
     }
 };
 
+// Get orders for the logged-in user
+const getUserOrdersController = async (req, res) => {
+    try {
+        const userId = req.user.id; // Get user ID from authenticated request
+
+        const orders = await Order.find({ buyer: userId })
+            .populate("products.product", "name price photo slug") // Populate product details within the products array
+            // .populate("buyer", "name email") // No need to populate buyer, we know who it is
+            .sort({ createdAt: -1 });
+
+        res.status(200).send({
+            success: true,
+            message: "User orders fetched successfully",
+            count: orders.length,
+            orders: orders,
+        });
+
+    } catch (error) {
+        console.log("Error fetching user orders:", error);
+        res.status(500).send({
+            success: false,
+            message: "Error fetching user orders",
+            error: error.message,
+        });
+    }
+};
+
 module.exports = { 
     getAllOrdersController, 
     updateOrderStatusController, 
-    getOrderStatsController
+    getOrderStatsController,
+    getUserOrdersController // Export the new controller
 }; 

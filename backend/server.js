@@ -6,6 +6,8 @@ const authRoute = require('./routes/authRoute.js');
 const categoryRoute = require('./routes/categoryRoute.js');
 const productRoute = require('./routes/productRoute.js');
 const esewaRoutes = require('./routes/esewaRoutes.js');
+const cartRoute = require('./routes/cartRoute.js');
+const orderRoute = require('./routes/orderRoute.js');
 const cors = require('cors');
 
 //configuring environment
@@ -25,6 +27,8 @@ connectDB()
         app.use('/api/v1/category', categoryRoute);
         app.use('/api/v1/product', productRoute);
         app.use('/api/v1/esewa', esewaRoutes);
+        app.use('/api/v1/cart', cartRoute);
+        app.use('/api/v1/order', orderRoute);
 
         app.get('/', (req, res) => {
             res.send(`<h1>Welcome to Omkara</h1>`);

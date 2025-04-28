@@ -77,7 +77,15 @@ const loginController = async (req, res) => {
         }
 
         //check user
-        const user = await userModel.findOne({email}, null, null);
+        // Find user and populate cart details
+        const user = await userModel.findOne({email}).populate({
+            path: 'cart.product',
+            select: 'name price photo slug description sizes quantity category',
+            populate: {
+                path: 'category',
+                select: 'name'
+            }
+        });
         if(!user){
             return res.status(404).send({
                 success: false,
@@ -108,6 +116,7 @@ const loginController = async (req, res) => {
                 createdAt: user.createdAt
             },
             token,
+            cart: user.cart || [] // Include the populated cart in the response
         })
     }catch(err){
         console.log(err);

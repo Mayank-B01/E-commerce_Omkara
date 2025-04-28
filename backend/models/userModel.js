@@ -32,7 +32,26 @@ const userSchema = new mongoose.Schema({
     role:{
         type:Number,
         default:0,
-    }
+    },
+    cart: [
+        {
+            product: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Products', // Reference the 'Products' model
+                required: true
+            },
+            quantity: {
+                type: Number,
+                required: true,
+                min: 1,
+                default: 1
+            },
+            size: {
+                type: String,
+                required: false // Or true, depending if size is always required
+            }
+        }
+    ]
 },{timestamps:true})
 
 module.exports =  mongoose.model('users', userSchema);

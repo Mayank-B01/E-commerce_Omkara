@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import '../styles/CartPage.css';
+import { Checkbox } from 'antd';
 
 const CartPage = ({ handleShowAuthModal }) => {
     const [auth, setAuth] = useAuth();
@@ -13,14 +14,55 @@ const CartPage = ({ handleShowAuthModal }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isProcessing, setIsProcessing] = useState(false);
+    const [selectedItems, setSelectedItems] = useState(new Set());
 
-    // Calculate Total Price
+    // Helper to create a unique ID for a cart item
+    const getItemId = (item) => {
+        return `${item.product?._id}${item.size ? `_${item.size}` : '_'}`;
+    };
+
+    // Toggle item selection
+    const handleSelectItem = (item, isChecked) => {
+        const itemId = getItemId(item);
+        setSelectedItems(prev => {
+            const newSelection = new Set(prev);
+            if (isChecked) {
+                newSelection.add(itemId);
+            } else {
+                newSelection.delete(itemId);
+            }
+            console.log("Selected Items:", newSelection); // Debug log
+            return newSelection;
+        });
+    };
+
+    // Select/Deselect All
+    const handleSelectAll = (isChecked) => {
+        if (isChecked) {
+            const allItemIds = new Set(cart.map(item => getItemId(item)));
+            setSelectedItems(allItemIds);
+        } else {
+            setSelectedItems(new Set());
+        }
+    };
+
+    // DEBUG: Log cart state on render
+    useEffect(() => {
+        console.log("CartPage Render - Cart State:", cart);
+    }, [cart]);
+
+    // Calculate Total Price of SELECTED items
     const totalPrice = () => {
         try {
             let total = 0;
             cart?.forEach((item) => {
-
-                total += item.price * (item.quantity || 1); 
+                const itemId = getItemId(item);
+                // Only include item if it's selected
+                if (selectedItems.has(itemId)) { 
+                    const price = item?.product?.price || 0;
+                    const quantity = item.quantity || 1;
+                    total += price * quantity; 
+                }
             });
 
             return total.toLocaleString("en-IN", { 
@@ -34,37 +76,103 @@ const CartPage = ({ handleShowAuthModal }) => {
     };
 
     // Remove item from cart
-    const removeCartItem = (productId, size) => {
+    const removeCartItem = async (productId, size) => {
         try {
-            let myCart = [...cart];
-            const index = myCart.findIndex(item => item._id === productId && item.selectedSize === size);
-            if (index !== -1) {
-                myCart.splice(index, 1);
-                setCart(myCart);
-                localStorage.setItem('cart', JSON.stringify(myCart)); // Update localStorage
-                toast.info('Item removed from cart');
+            if (auth?.token) {
+                // Logged in: Call API
+                // Note: size might be optional, adjust API call based on backend route definition
+                const { data } = await axios.delete(
+                    `${import.meta.env.VITE_API}/api/v1/cart/remove/${productId}${size ? `?size=${encodeURIComponent(size)}` : ''}`,
+                     {
+                         headers: {
+                            Authorization: `Bearer ${auth.token}` // Send token
+                         }
+                    }
+                );
+                if (data?.success) {
+                    toast.info('Item removed from cart');
+                    // Update context by filtering out the removed item
+                     let myCart = cart.filter(item => !(item.product._id === productId && item.size === size));
+                    setCart(myCart);
+                } else {
+                    toast.error(data?.message || 'Could not remove item from cart.');
+                }
             } else {
-                toast.error('Could not find item in cart');
+                // Not logged in: Use Local Storage
+                let myCart = [...cart];
+                const index = myCart.findIndex(item => item._id === productId && item.selectedSize === size);
+                if (index !== -1) {
+                    myCart.splice(index, 1);
+                    setCart(myCart);
+                    localStorage.setItem('cart', JSON.stringify(myCart)); // Update localStorage
+                    toast.info('Item removed from cart');
+                } else {
+                    toast.error('Could not find item in cart');
+                }
             }
         } catch (error) {
-            console.log("Error removing item:", error);
-            toast.error("Error removing item from cart");
+            console.error("Error removing item:", error);
+            toast.error(error.response?.data?.message || "Error removing item from cart");
         }
     };
     
-    // Handle Quantity Change (Example - if quantity adjustable in cart)
-    const handleQuantityChange = (productId, size, newQuantity) => {
-        if (newQuantity < 1) return; // Minimum quantity is 1
+    // Handle Quantity Change
+    const handleQuantityChange = async (productId, size, newQuantity) => {
+        // Ensure newQuantity is a number and >= 0 (0 means remove)
+        const quantityNum = Number(newQuantity);
+         if (isNaN(quantityNum) || quantityNum < 0) return;
+
         try {
-            let myCart = [...cart];
-            const index = myCart.findIndex(item => item._id === productId && item.selectedSize === size);
-            if (index !== -1) {
-                myCart[index].quantity = newQuantity;
-                setCart(myCart);
-                localStorage.setItem('cart', JSON.stringify(myCart));
+             if (auth?.token) {
+                 // Logged in: Call API
+                 const { data } = await axios.put(
+                     `${import.meta.env.VITE_API}/api/v1/cart/update-quantity`,
+                     { productId, quantity: quantityNum, size },
+                      {
+                         headers: {
+                            Authorization: `Bearer ${auth.token}` // Send token
+                         }
+                     }
+                 );
+                 if (data?.success) {
+                     // Update context based on the new quantity
+                     let myCart = cart.map(item => {
+                         if (item.product._id === productId && item.size === size) {
+                             return { ...item, quantity: quantityNum };
+                         }
+                         return item;
+                     }).filter(item => item.quantity > 0); // Filter out items with quantity 0
+
+                     setCart(myCart);
+                     if (quantityNum > 0) {
+                         toast.info('Cart quantity updated');
+                     } else {
+                         toast.info('Item removed from cart');
+                     }
+                 } else {
+                     toast.error(data?.message || 'Could not update quantity.');
+                 }
+             } else {
+                 // Not logged in: Use Local Storage
+                 let myCart = [...cart];
+                 const index = myCart.findIndex(item => item._id === productId && item.selectedSize === size);
+                 if (index !== -1) {
+                    if (quantityNum === 0) {
+                        myCart.splice(index, 1); // Remove item if quantity is 0
+                        toast.info('Item removed from cart');
+                    } else {
+                         myCart[index].quantity = quantityNum;
+                         toast.info('Cart quantity updated');
+                    }
+                    setCart(myCart);
+                    localStorage.setItem('cart', JSON.stringify(myCart));
+                 } else {
+                     toast.error('Could not find item in cart to update.');
+                 }
             }
         } catch (error) {
-            console.log("Error updating quantity:", error);
+            console.error("Error updating quantity:", error);
+             toast.error(error.response?.data?.message || "Error updating quantity");
         }
     };
 
@@ -97,27 +205,51 @@ const CartPage = ({ handleShowAuthModal }) => {
 
     const handleEsewaCheckout = async () => {
         if (isProcessing) return;
+        if (selectedItems.size === 0) {
+            toast.error("Please select items to checkout.");
+            return;
+        }
+
         setIsProcessing(true);
         toast.info("Initiating payment process...");
 
+        // Filter cart to get only selected items
+        const itemsToCheckout = cart.filter(item => selectedItems.has(getItemId(item)));
+        
+        // Recalculate amount based on selected items (client-side for display/initiation)
+        let orderAmount = 0;
+        itemsToCheckout.forEach(item => {
+            orderAmount += (item.product?.price || 0) * (item.quantity || 1);
+        });
+
+        // **TODO LATER:** Modify API call to send `itemsToCheckout` details, 
+        // not just the calculated `orderAmount`.
+        // Backend needs to recalculate amount based on received items.
+
+        const uniqueOrderId = `OMK-${Date.now()}-${auth.user?._id?.slice(-4) || 'GUEST'}`;
+
+        // Prepare data for backend (including selected items)
+        const payload = {
+            // Send only essential details needed by backend to validate/get price
+            selectedItems: itemsToCheckout.map(item => ({
+                productId: item.product._id,
+                quantity: item.quantity,
+                size: item.size
+            })),
+            orderId: uniqueOrderId 
+        };
+
         try {
-
-            const orderAmount = parseFloat(totalPrice().replace(/[^\d.-]/g,"")); // Extract number
-            const uniqueOrderId = `OMK-${Date.now()}-${auth.user?._id?.slice(-4) || 'GUEST'}`;
-
-            if (orderAmount <= 0) {
-                toast.error("Cannot process payment with zero or negative amount.");
-                setIsProcessing(false);
-                return;
-            }
-
-            console.log(`[Frontend Checkout] Initiating payment for Order ID: ${uniqueOrderId}, Amount: ${orderAmount}`);
+             if (orderAmount <= 0) {
+                 toast.error("Cannot process payment with zero or negative amount.");
+                 setIsProcessing(false);
+                 return;
+             }
+ 
+            console.log(`[Frontend Checkout] Initiating payment for Order ID: ${uniqueOrderId}, Items:`, payload.selectedItems);
             const { data } = await axios.post(
-                `${import.meta.env.VITE_API}/api/v1/esewa/initiate`, // Correct backend route
-                {
-                    amount: orderAmount,
-                    orderId: uniqueOrderId,
-                },
+                `${import.meta.env.VITE_API}/api/v1/esewa/initiate`, 
+                payload, // Send the payload with selectedItems and orderId
                 {
                     headers: {
                         Authorization: `Bearer ${auth?.token}` 
@@ -162,40 +294,65 @@ const CartPage = ({ handleShowAuthModal }) => {
                 <div className="row justify-content-center">
                     {/* Cart Items */}    
                     <div className="col-md-8 mb-4">
-                        {cart?.map((p) => (
-                            <div className="row cart-item-card mb-3 p-3 border rounded" key={`${p._id}-${p.selectedSize}`}> {/* Use combined key */}
-                                <div className="col-md-3 text-center">
-                                    <img
-                                        src={`${import.meta.env.VITE_API}/api/v1/product/product-photo/${p._id}`}
-                                        className="img-fluid cart-item-image" 
-                                        alt={p.name}
-                                    />
-                                </div>
-                                <div className="col-md-9">
-                                    <h5>{p.name}</h5>
-                                    {p.selectedSize && <p className="mb-1"><small>Size: {p.selectedSize}</small></p>} 
-                                    <p className="mb-1">Quantity: {p.quantity || 1}</p> 
-                                    <div className="d-flex align-items-center mb-2">
-                                        <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => handleQuantityChange(p._id, p.selectedSize, (p.quantity || 1) - 1)}>-</button>
-                                        <span>{p.quantity || 1}</span>
-                                        <button className="btn btn-outline-secondary btn-sm ms-2" onClick={() => handleQuantityChange(p._id, p.selectedSize, (p.quantity || 1) + 1)}>+</button>
-                                    </div> 
-                                    <p className="fw-bold mb-2">Price: Rs {p.price}</p>
-                                    <button 
-                                        className="btn btn-danger btn-sm" 
-                                        onClick={() => removeCartItem(p._id, p.selectedSize)}
-                                    >
-                                        <i className="bi bi-trash-fill me-1"></i> Remove from Cart
-                                    </button>
-                                </div>
+                        {/* Select All Checkbox */}    
+                        {cart?.length > 0 && (
+                            <div className="mb-3 border-bottom pb-2">
+                                <Checkbox 
+                                    onChange={(e) => handleSelectAll(e.target.checked)}
+                                    checked={selectedItems.size === cart.length && cart.length > 0}
+                                    indeterminate={selectedItems.size > 0 && selectedItems.size < cart.length}
+                                >
+                                    Select All
+                                </Checkbox>
                             </div>
-                        ))}
+                        )}
+
+                        {cart?.map((p) => {
+                            const itemId = getItemId(p);
+                            const isSelected = selectedItems.has(itemId);
+                            return (
+                                <div className={`row cart-item-card mb-3 p-3 border rounded ${isSelected ? 'selected-item' : ''}`} key={itemId}>
+                                    {/* Checkbox Column */}
+                                    <div className="col-1 d-flex align-items-center justify-content-center">
+                                        <Checkbox 
+                                            checked={isSelected}
+                                            onChange={(e) => handleSelectItem(p, e.target.checked)}
+                                        />
+                                    </div>
+                                    {/* Image Column */}
+                                    <div className="col-md-3 text-center">
+                                        <img
+                                            src={`${import.meta.env.VITE_API}/api/v1/product/product-photo/${p.product?._id}`}
+                                            className="img-fluid cart-item-image" 
+                                            alt={p.product?.name || 'Product image'} 
+                                        />
+                                    </div>
+                                     {/* Details Column */}
+                                    <div className="col-md-8">
+                                        <h5>{p.product?.name}</h5>
+                                        {p.size && <p className="mb-1"><small>Size: {p.size}</small></p>} 
+                                        <div className="d-flex align-items-center mb-2">
+                                            <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => handleQuantityChange(p.product._id, p.size, (p.quantity || 1) - 1)}>-</button>
+                                            <span>{p.quantity || 1}</span>
+                                            <button className="btn btn-outline-secondary btn-sm ms-2" onClick={() => handleQuantityChange(p.product._id, p.size, (p.quantity || 1) + 1)}>+</button>
+                                        </div> 
+                                        <p className="fw-bold mb-2">Price: Rs {p.product?.price}</p>
+                                        <button 
+                                            className="btn btn-danger btn-sm" 
+                                            onClick={() => removeCartItem(p.product._id, p.size)}
+                                        >
+                                            <i className="bi bi-trash-fill me-1"></i> Remove from Cart
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                     {/* Cart Summary / Checkout */}    
                     {cart?.length > 0 && (
                         <div className="col-md-4 cart-summary text-center">
                             <h4>Cart Summary</h4>
-                            <p>Total | Checkout | Payment</p>
+                            <p>Total ({selectedItems.size} item(s) selected)</p>
                             <hr />
                             <h5>Checkout Total:</h5> 
                             <h4 className="fw-bold mb-4">{totalPrice()}</h4>
@@ -235,7 +392,7 @@ const CartPage = ({ handleShowAuthModal }) => {
                                 <button
                                     className="btn btn-success"
                                     onClick={handleEsewaCheckout}
-                                    disabled={isProcessing || !auth?.token || !auth?.user?.address || cart?.length === 0}
+                                    disabled={isProcessing || !auth?.token || !auth?.user?.address || selectedItems.size === 0}
                                 >
                                     {isProcessing ? "Processing..." : "Proceed to Checkout (eSewa)"}
                                 </button>

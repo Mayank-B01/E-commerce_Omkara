@@ -12,6 +12,7 @@ const AdminDashboard = () => {
     const [userCount, setUserCount] = useState(null);
     const [orderCount, setOrderCount] = useState(null);
     const [productCount, setProductCount] = useState(null);
+    const [totalRevenue, setTotalRevenue] = useState(null);
 
     const handleLogout = () => {
         setAuth({
@@ -29,20 +30,31 @@ const AdminDashboard = () => {
         const fetchDashboardData = async () => {
             try {
                 document.title = "Admin Dashboard";
-                const countcheck = async() => {
-                    const res = await axios.get((`${import.meta.env.VITE_API}/api/v1/auth/count`));
-                    console.log(res);
-                    setUserCount(res.data.count);
-                }
-                countcheck();
+                
+                const [userRes, productRes, orderStatsRes] = await Promise.all([
+                    axios.get(`${import.meta.env.VITE_API}/api/v1/auth/count`), 
+                    axios.get(`${import.meta.env.VITE_API}/api/v1/auth/productcount`), 
+                    axios.get(`${import.meta.env.VITE_API}/api/v1/order/stats`)
+                ]);
 
-                const productCount = async() => {
-                    const res = await axios.get((`${import.meta.env.VITE_API}/api/v1/auth/productcount`));
-                    console.log(res);
-                    setProductCount(res.data.count);
+                if (userRes.data) {
+                    setUserCount(userRes.data.count);
+                } else {
+                     console.error("Failed to get user count");
                 }
-                productCount();
-                setOrderCount(5)
+
+                if (productRes.data) {
+                     setProductCount(productRes.data.count);
+                } else {
+                    console.error("Failed to get product count");
+                }
+                
+                if (orderStatsRes.data) {
+                     setOrderCount(orderStatsRes.data.count);
+                     setTotalRevenue(orderStatsRes.data.totalRevenue);
+                } else {
+                    console.error("Failed to get order stats");
+                }
 
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
@@ -84,7 +96,7 @@ const AdminDashboard = () => {
                             <div className="card-header">Admin Dashboard Overview</div>
                             <div className="card-body">
                                 <div className="row mb-4">
-                                    <div className="col-md-4">
+                                    <div className="col-md-3">
                                         <div className="card text-center h-100">
                                             <div className="card-body d-flex flex-column justify-content-between">
                                                 <div>
@@ -97,7 +109,7 @@ const AdminDashboard = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-md-4">
+                                    <div className="col-md-3">
                                         <div className="card text-center h-100">
                                             <div className="card-body d-flex flex-column justify-content-between">
                                                  <div>
@@ -110,7 +122,7 @@ const AdminDashboard = () => {
                                             </div>
                                         </div>
                                     </div>
-                                     <div className="col-md-4">
+                                     <div className="col-md-3">
                                         <div className="card text-center h-100">
                                             <div className="card-body d-flex flex-column justify-content-between">
                                                 <div>
@@ -120,6 +132,21 @@ const AdminDashboard = () => {
                                                     </p>
                                                 </div>
                                                 <NavLink to="/dashboard/admin/products" className="btn btn-outline-dark btn-sm mt-auto">Manage Products</NavLink>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-3">
+                                        <div className="card text-center h-100">
+                                            <div className="card-body d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <h5 className="card-title">Total Revenue</h5>
+                                                    <p className="card-text fs-4 fw-bold">
+                                                        {totalRevenue !== null ? 
+                                                            `Rs ${totalRevenue.toLocaleString('en-IN')}` : 
+                                                            <span className="spinner-border spinner-border-sm" role="status"></span>}
+                                                    </p>
+                                                </div>
+                                                <NavLink to="/dashboard/admin/orders" className="btn btn-outline-dark btn-sm mt-auto">View Orders</NavLink>
                                             </div>
                                         </div>
                                     </div>
