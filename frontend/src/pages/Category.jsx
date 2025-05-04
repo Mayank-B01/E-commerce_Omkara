@@ -6,21 +6,26 @@ import axios from 'axios';
 import {Prices} from "../components/Prices.js";
 import { toast } from 'react-toastify';
 import { useCart } from "../context/cart.jsx";
+import { Pagination } from 'antd';
 
 // Static sizes for now
 const Sizes = ["S", "M", "L", "XL", "XXL"];
+const PAGE_SIZE = 16;
 
 const Category = ({ handleShowAuthModal }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [auth] = useAuth();
-    const [cart, setCart] = useCart(); // Use cart context
+    const [cart, setCart] = useCart();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [checked, setChecked] = useState([]);
     const [radio, setRadio] = useState([]);
     const [checkedSizes, setCheckedSizes] = useState([]);
     const [sortBy, setSortBy] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalProducts, setTotalProducts] = useState(0);
+    const [loading, setLoading] = useState(false);
     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
     const [searchNameFromUrl, setSearchNameFromUrl] = useState("");
 
@@ -40,7 +45,6 @@ const Category = ({ handleShowAuthModal }) => {
         getAllCategories();
     }, []);
 
-
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const nameSearch = params.get('searchName');
@@ -49,6 +53,7 @@ const Category = ({ handleShowAuthModal }) => {
         
         setInitialLoadComplete(false);
         setSearchNameFromUrl("");
+        setCurrentPage(1);
 
         if (nameSearch) {
             console.log("Handling searchName:", nameSearch);
@@ -57,7 +62,7 @@ const Category = ({ handleShowAuthModal }) => {
             setRadio([]);
             setCheckedSizes([]);
             setSortBy("");
-            fetchProductsByCategoryName(nameSearch); 
+            fetchProductsByCategoryName(nameSearch, 1);
             handledByUrl = true;
         } else if (categorySlugFromUrl && categories.length > 0) {
              console.log("Handling cat:", categorySlugFromUrl);
@@ -67,7 +72,6 @@ const Category = ({ handleShowAuthModal }) => {
                  setRadio([]); 
                  setCheckedSizes([]);
                  setSortBy("");
-
              } else {
                  console.warn(`Category slug "${categorySlugFromUrl}" from URL not found.`);
                  setChecked([]);
@@ -75,7 +79,6 @@ const Category = ({ handleShowAuthModal }) => {
              handledByUrl = true;
         } else if (categorySlugFromUrl && categories.length === 0) {
              console.log("'cat' param found, but categories not loaded yet. Waiting...");
-
         } else if (!categorySlugFromUrl && !nameSearch) {
             console.log("No 'cat' or 'searchName' found in URL, clearing category filter.");
             setChecked([]);
@@ -95,57 +98,90 @@ const Category = ({ handleShowAuthModal }) => {
         if (searchNameFromUrl) return; 
 
         const hasFilters = checked.length > 0 || radio.length > 0 || checkedSizes.length > 0 || sortBy;
-        console.log("Filter Effect: hasFilters:", hasFilters, "searchNameFromUrl:", searchNameFromUrl);
+        console.log("Filter/Page Effect: Page:", currentPage, "HasFilters:", hasFilters, "Search:", searchNameFromUrl);
 
         if (hasFilters) {
-            filterProduct(); 
+            filterProduct(currentPage); 
         } else {
-            getAllProducts();
+            getAllProducts(currentPage);
         }
 
-    }, [checked, radio, checkedSizes, sortBy, initialLoadComplete, searchNameFromUrl]);
+    }, [checked, radio, checkedSizes, sortBy, currentPage, initialLoadComplete, searchNameFromUrl]);
 
-    //get all products
-     const getAllProducts = async () => {
+    useEffect(() => {
+        if (initialLoadComplete) {
+             console.log("Filter change detected, resetting to page 1");
+             setCurrentPage(1);
+        }
+    }, [checked, radio, checkedSizes, sortBy]);
+
+    const getAllProducts = async (page = 1) => {
+        setLoading(true);
         try {
-            const {data} = await axios.get(`${import.meta.env.VITE_API}/api/v1/product/get-product`);
-            setProducts(data.products);
+            const {data} = await axios.get(`${import.meta.env.VITE_API}/api/v1/product/get-product?page=${page}`);
+            if(data?.success) {
+                 setProducts(data.products);
+                 setTotalProducts(data.total);
+            } else {
+                 setProducts([]);
+                 setTotalProducts(0);
+                 toast.error(data?.message || "Failed to fetch products");
+            }
         } catch (error) {
              console.log(error);
-            toast.error("Error fetching all products");
+             setProducts([]);
+             setTotalProducts(0);
+             toast.error("Error fetching all products");
+        } finally {
+             setLoading(false);
         }
     }
 
-    // Fetch products by category name (NEW)
-    const fetchProductsByCategoryName = async (nameTerm) => {
+    const fetchProductsByCategoryName = async (nameTerm, page = 1) => {
+         setLoading(true);
         try {
-            const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/product/product-category-name-search`, { searchName: nameTerm });
+            const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/product/product-category-name-search?page=${page}`, { keyword: nameTerm });
             if (data?.success) {
                 setProducts(data?.products);
+                 setTotalProducts(data.total);
             } else {
-                setProducts([]); // Clear products if search fails or returns none
+                setProducts([]); 
+                setTotalProducts(0);
                 toast.error(data?.message || "Error searching products by category name");
             }
         } catch (error) {
             setProducts([]);
+            setTotalProducts(0);
             console.log(error);
             toast.error("Something went wrong searching products by category name");
+        } finally {
+             setLoading(false);
         }
     };
 
-    // Fetch products by filters (checkboxes, radio, size, sort)
-    const filterProduct = async () => {
-        setSearchNameFromUrl(""); 
+    const filterProduct = async (page = 1) => {
+        setSearchNameFromUrl("");
+        setLoading(true);
         try {
-            const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/product/product-filters`, { checked, radio, checkedSizes, sortBy });
-            setProducts(data?.products);
+            const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/product/product-filters?page=${page}`, { checked, radio, checkedSizes, sortBy });
+             if(data?.success) {
+                 setProducts(data.products);
+                 setTotalProducts(data.total);
+             } else {
+                 setProducts([]);
+                 setTotalProducts(0);
+                 toast.error(data?.message || "Failed to fetch filtered products");
+             }
         } catch (error) {
             console.log(error);
+            setProducts([]);
+            setTotalProducts(0);
             toast.error("Error filtering products");
+        } finally {
+             setLoading(false);
         }
     };
 
-    // Handle filter checkbox changes
     const handleFilter = (value, id) => {
         let all = [...checked];
         if (value) {
@@ -156,7 +192,6 @@ const Category = ({ handleShowAuthModal }) => {
         setChecked(all);
     };
 
-    // Handle size filter checkbox changes
     const handleSizeFilter = (value, size) => {
         let all = [...checkedSizes];
         if (value) {
@@ -167,22 +202,26 @@ const Category = ({ handleShowAuthModal }) => {
         setCheckedSizes(all);
     };
 
-    // Reset filters
     const resetFilters = () => {
         setChecked([]);
         setRadio([]);
         setCheckedSizes([]);
         setSortBy("");
         setSearchNameFromUrl("");
-
+        setCurrentPage(1);
     }
+
+    const handlePageChange = (page) => {
+        console.log("Page changed to:", page);
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     return(
         <Layout title={'Omkara - Products'} handleShowAuthModal={handleShowAuthModal}>
             <div className="container-fluid row mt-3">
 
                 <div className="col-md-2">
-                    {/* Display search term if active */}
                     {searchNameFromUrl && (
                         <div className="alert alert-info p-2 mb-3" role="alert">
                            Showing results for "{searchNameFromUrl}"
@@ -190,7 +229,6 @@ const Category = ({ handleShowAuthModal }) => {
                     )}
                     <h4 className="text-center mb-3">Filters <i className="bi bi-funnel"></i></h4>
 
-                    {/* Category Filter */}
                     <h6 className="mt-4">Category</h6>
                     <div className="d-flex flex-column ms-1">
                         {categories?.map((c) => (
@@ -208,7 +246,6 @@ const Category = ({ handleShowAuthModal }) => {
                         ))}
                     </div>
 
-                    {/* Price Filter */}
                     <h6 className="mt-4">Price range</h6>
                     <div className="d-flex flex-column ms-1">
                         {Prices?.map((p) => (
@@ -228,7 +265,6 @@ const Category = ({ handleShowAuthModal }) => {
                         ))}
                     </div>
 
-                    {/* Size Filter */}
                     <h6 className="mt-4">Size</h6>
                     <div className="d-flex flex-column ms-1">
                         {Sizes?.map((s, index) => (
@@ -246,18 +282,15 @@ const Category = ({ handleShowAuthModal }) => {
                         ))}
                     </div>
 
-                    {/* Reset Button */}
                     <div className="d-flex flex-column mt-4">
                         <button className="btn btn-danger" onClick={resetFilters}>Reset Filters</button>
                     </div>
                 </div>
 
-                {/* Products Section */}
                 <div className="col-md-10">
                     <h1 className="text-center">
                         {searchNameFromUrl ? `Products matching "${searchNameFromUrl}"` : "All Products"}
                     </h1>
-                    {/* Sort By Dropdown */}
                     <div className="d-flex justify-content-end mb-3">
                         <select 
                             className="form-select w-auto"
@@ -271,87 +304,120 @@ const Category = ({ handleShowAuthModal }) => {
                         </select>
                     </div>
 
-                    {/* Product Grid */}
-                    <div className="d-flex flex-wrap justify-content-center">
-                        {products?.length > 0 ? products.map((p) => (
-                            <div className="card m-2" style={{ width: '18rem' }} key={p._id} >
-                                <img src={`${import.meta.env.VITE_API}/api/v1/product/product-photo/${p._id}`} className="card-img-top p-2" alt={p.name} style={{height: "250px", objectFit: "contain"}}/>
-                                <div className="card-body text-center">
-                                    <h5 className="card-title">{p.name}</h5>
-                                    <p className="card-text">Rs {p.price}</p>
-                                    <button
-                                        className='btn btn-sm btn-outline-dark ms-1'
-                                        onClick={() => navigate(`/product/${p.slug}`)}
-                                    >
-                                        Shop
-                                    </button>
-                                    <button
-                                        className='btn btn-sm btn-dark ms-1'
-                                        onClick={async () => {
-                                            const cartItem = {
-                                                productId: p._id,
-                                                quantity: 1,
-                                                size: p.sizes?.length > 0 ? p.sizes[0] : null,
-                                                _id: p._id,
-                                                name: p.name,
-                                                price: p.price,
-                                                selectedSize: p.sizes?.length > 0 ? p.sizes[0] : null
-                                            };
-
-                                            if (auth?.token) {
-                                                try {
-                                                    const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/cart/add`,
-                                                        { productId: cartItem.productId, quantity: cartItem.quantity, size: cartItem.size },
-                                                        { headers: { Authorization: `Bearer ${auth.token}` } }
-                                                    );
-                                                    if (data?.success) {
-                                                        toast.success('Item added to cart!');
-                                                        const existingItemIndex = cart.findIndex(item => item.product?._id === cartItem.productId && item.size === cartItem.size);
-                                                         if (existingItemIndex > -1) {
-                                                             const updatedCart = [...cart];
-                                                             updatedCart[existingItemIndex].quantity += cartItem.quantity;
-                                                             setCart(updatedCart);
+                    <div className="category-products-grid">
+                        {loading ? (
+                            <p>Loading products...</p>
+                        ) : products?.length > 0 ? (
+                            products.map(p => (
+                                 <div className="card m-2 product-card" key={p._id}>
+                                      <img
+                                         src={`${import.meta.env.VITE_API}/api/v1/product/product-photos/${p._id}?first=true`}
+                                         className="card-img-top product-card-image"
+                                         alt={p.name}
+                                         onError={(e) => { e.target.onerror = null; e.target.src="/images/placeholder.png"; }}
+                                         onClick={() => navigate(`/product/${p.slug}`)}
+                                         style={{ cursor: 'pointer' }}
+                                     />
+                                     <div className="card-body">
+                                         <div className="card-details-row">
+                                             <div className="card-info">
+                                                 <h5 className="card-title text-truncate" title={p.name}>{p.name}</h5>
+                                                 <p className="card-text price-display">Rs {p.price?.toFixed(2)}</p>
+                                             </div>
+                                             <div className="card-actions">
+                                                 <button
+                                                     className='btn btn-sm btn-outline-dark'
+                                                     onClick={() => navigate(`/product/${p.slug}`)}
+                                                     title="View Details"
+                                                 >
+                                                     Shop 
+                                                 </button>
+                                                 <button
+                                                     className='btn btn-sm btn-dark'
+                                                     onClick={async () => {
+                                                          const cartItem = {
+                                                             productId: p._id,
+                                                             quantity: 1,
+                                                             size: p.sizes?.length > 0 ? p.sizes[0] : null,
+                                                             _id: p._id,
+                                                             name: p.name,
+                                                             price: p.price,
+                                                             selectedSize: p.sizes?.length > 0 ? p.sizes[0] : null
+                                                         };
+                                                          if (auth?.token) {
+                                                             try {
+                                                                 const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/cart/add`,
+                                                                     { productId: cartItem.productId, quantity: cartItem.quantity, size: cartItem.size },
+                                                                     { headers: { Authorization: `Bearer ${auth.token}` } }
+                                                                 );
+                                                                 if (data?.success) {
+                                                                     toast.success('Item added to cart!');
+                                                                     const existingItemIndex = cart.findIndex(item => item.product?._id === cartItem.productId && item.size === cartItem.size);
+                                                                     if (existingItemIndex > -1) {
+                                                                         const updatedCart = [...cart];
+                                                                         updatedCart[existingItemIndex].quantity += cartItem.quantity;
+                                                                         setCart(updatedCart);
+                                                                     } else {
+                                                                         setCart([...cart, { product: { ...p, _id: cartItem.productId }, quantity: cartItem.quantity, size: cartItem.size }]);
+                                                                     }
+                                                                 } else {
+                                                                     toast.error(data?.message || "Failed to add item.");
+                                                                 }
+                                                             } catch (error) {
+                                                                 toast.error(error.response?.data?.message || "Error adding item.");
+                                                                 console.error("Error adding item via API:", error);
+                                                             }
                                                          } else {
-                                                             setCart([...cart, { product: { ...p, _id: cartItem.productId }, quantity: cartItem.quantity, size: cartItem.size }]);
+                                                              const existingItemIndex = cart.findIndex(item => 
+                                                                item.product?._id === cartItem.productId && item.size === cartItem.size
+                                                             );
+                                                             let updatedCart;
+                                                             if (existingItemIndex > -1) {
+                                                                 updatedCart = [...cart];
+                                                                 updatedCart[existingItemIndex].quantity += cartItem.quantity;
+                                                             } else {
+                                                                 const newItemForLocalStorage = {
+                                                                    product: { 
+                                                                        _id: cartItem.productId,
+                                                                        name: cartItem.name,
+                                                                        price: cartItem.price,
+                                                                        slug: p.slug, 
+                                                                        sizes: p.sizes
+                                                                    },
+                                                                    quantity: cartItem.quantity,
+                                                                    size: cartItem.size
+                                                                 };
+                                                                 updatedCart = [...cart, newItemForLocalStorage];
+                                                             }
+                                                             setCart(updatedCart);
+                                                             localStorage.setItem('cart', JSON.stringify(updatedCart));
+                                                             toast.success('Item added to cart!');
                                                          }
-                                                    } else {
-                                                        toast.error(data?.message || "Failed to add item.");
-                                                    }
-                                                } catch (error) {
-                                                    toast.error(error.response?.data?.message || "Error adding item.");
-                                                    console.error("Error adding item via API:", error);
-                                                }
-                                            } else {
-                                                const existingCartItemIndex = cart.findIndex(item => item._id === cartItem._id && item.selectedSize === cartItem.selectedSize);
-                                                let updatedCart;
-                                                if (existingCartItemIndex > -1) {
-                                                    updatedCart = [...cart];
-                                                    updatedCart[existingCartItemIndex].quantity += cartItem.quantity;
-                                                } else {
-                                                    updatedCart = [...cart, cartItem];
-                                                }
-                                                setCart(updatedCart);
-                                                localStorage.setItem('cart', JSON.stringify(updatedCart));
-                                                toast.success('Item added to cart!');
-                                            }
-                                        }}
-                                    >
-                                        Add to Cart <i className="bi bi-cart-plus-fill"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        )) : (
-                            <div className="text-center w-100 mt-4">
-                                <h4>No products found matching your criteria.</h4>
-                        </div>
+                                                      }}
+                                                     title="Add to Cart"
+                                                 >
+                                                     Add to Cart 
+                                                 </button>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                            ))
+                        ) : (
+                             !loading && <p>No products found matching your criteria.</p>
                         )}
                     </div>
 
-                    {/* Load More Button */}
-                    <div className="m-2 p-3 text-center">
-                        <button>
-                            Load More <i className="bi bi-caret-down-fill"></i>
-                        </button>
+                    <div className="d-flex justify-content-center mt-4">
+                         {totalProducts > PAGE_SIZE && (
+                             <Pagination
+                                current={currentPage}
+                                total={totalProducts}
+                                pageSize={PAGE_SIZE}
+                                onChange={handlePageChange}
+                                showSizeChanger={false}
+                            />
+                         )}
                     </div>
                 </div>
                 </div>

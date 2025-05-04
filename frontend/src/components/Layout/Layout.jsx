@@ -8,7 +8,7 @@ const Layout = ({children, title, description, keywords, author, handleShowAuthM
         <div style={{
             display: 'flex',
             flexDirection: 'column',
-            height: '100%'
+            minHeight: '100vh'
         }}>
             <Helmet>
                 <meta charSet="utf-8" />

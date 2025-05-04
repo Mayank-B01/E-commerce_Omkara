@@ -26,14 +26,18 @@ const productSchema = new mongoose.Schema({
         type:Number,
         required:true
     },
-    photo:{
+    photos:[{
         data:Buffer,
         contentType:String,
-    },
+    }],
     shipping:{
         type:Boolean
     },
     sizes: {
+        type: [String],
+        default: []
+    },
+    colors: {
         type: [String],
         default: []
     }

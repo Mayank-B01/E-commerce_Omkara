@@ -160,12 +160,13 @@ const OrderPage = () => {
                                                 <h6>Order Items:</h6>
                                                 {o?.products?.map((item) => (
                                                     <div className="row mb-2 p-2 card flex-row align-items-center" key={item.product?._id || item._id}>
-                                                        <div className="col-md-2">
+                                                        <div className="col-md-2 text-center">
                                                             <img
-                                                                src={`${import.meta.env.VITE_API}/api/v1/product/product-photo/${item.product?._id}`}
+                                                                src={`${import.meta.env.VITE_API}/api/v1/product/product-photos/${item.product?._id}?first=true`}
                                                                 className="img-fluid rounded"
-                                                                alt={item.product?.name}
-                                                                style={{maxHeight: '80px'}}
+                                                                alt={item.product?.name || 'Product Image'}
+                                                                style={{maxHeight: '80px', objectFit: 'contain'}}
+                                                                onError={(e) => { e.target.onerror = null; e.target.src='/images/placeholder.png'; }}
                                                             />
                                                         </div>
                                                         <div className="col-md-8">

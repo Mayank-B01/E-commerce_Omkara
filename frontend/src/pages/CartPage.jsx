@@ -320,11 +320,14 @@ const CartPage = ({ handleShowAuthModal }) => {
                                         />
                                     </div>
                                     {/* Image Column */}
-                                    <div className="col-md-3 text-center">
+                                    <div className="col-md-2 text-center">
                                         <img
-                                            src={`${import.meta.env.VITE_API}/api/v1/product/product-photo/${p.product?._id}`}
-                                            className="img-fluid cart-item-image" 
-                                            alt={p.product?.name || 'Product image'} 
+                                            src={`${import.meta.env.VITE_API}/api/v1/product/product-photos/${p.product?._id}?first=true`}
+                                            className="img-fluid rounded cart-item-image"
+                                            alt={p.product?.name || 'Product Image'}
+                                            onError={(e) => { e.target.onerror = null; e.target.src='/images/placeholder.png'; }} // Fallback placeholder
+                                            style={{ maxHeight: '100px', objectFit: 'contain', cursor: 'pointer'}} // Added pointer cursor
+                                            onClick={() => navigate(`/product/${p.product?.slug}`)} // Link to product
                                         />
                                     </div>
                                      {/* Details Column */}

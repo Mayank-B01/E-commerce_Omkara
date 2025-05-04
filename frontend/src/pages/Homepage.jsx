@@ -90,8 +90,9 @@ const Homepage = ({ handleShowAuthModal }) => {
                                 className={`carousel-slide ${index === currentSlide ? 'active' : ''}`}
                             >
                                 <img 
-                                    src={`${import.meta.env.VITE_API}/api/v1/product/product-photo/${product._id}`}
+                                    src={`${import.meta.env.VITE_API}/api/v1/product/product-photos/${product._id}?first=true`}
                                     alt={product.name} 
+                                    onError={(e) => { e.target.onerror = null; e.target.src="/images/placeholder.png"}}
                                 />
                                 <div className="featured-badge">New Arrival</div>
                                 <div className="hero-text">
@@ -148,70 +149,92 @@ const Homepage = ({ handleShowAuthModal }) => {
                     {trendingProducts.map(product => (
                         <div key={product._id} className="product-card">
                             <img 
-                                src={`${import.meta.env.VITE_API}/api/v1/product/product-photo/${product._id}`}
+                                src={`${import.meta.env.VITE_API}/api/v1/product/product-photos/${product._id}?first=true`}
                                 alt={product.name} 
+                                onError={(e) => { e.target.onerror = null; e.target.src="/images/placeholder.png"}}
                             />
-                            <h3>{product.name}</h3>
-                            <p className="price">Rs. {product.price}</p>
-                            <button
-                                className='btn btn-sm btn-outline-dark ms-1'
-                                onClick={() => navigate(`/product/${product.slug}`)}
-                            >
-                                Shop
-                            </button>
-                            <button
-                                className='btn btn-sm btn-dark ms-1'
-                                onClick={async () => {
-                                    const cartItem = {
-                                        productId: product._id,
-                                        quantity: 1,
-                                        size: product.sizes?.length > 0 ? product.sizes[0] : null,
-                                        _id: product._id,
-                                        name: product.name,
-                                        price: product.price,
-                                        selectedSize: product.sizes?.length > 0 ? product.sizes[0] : null
-                                    };
+                            <div className="card-body">
+                                <div className="card-details-row">
+                                    <div className="card-info">
+                                        <h3>{product.name}</h3>
+                                        <p className="price">Rs. {product.price}</p>
+                                    </div>
+                                    <div className="card-actions">
+                                        <button
+                                            className='btn btn-sm btn-outline-dark'
+                                            onClick={() => navigate(`/product/${product.slug}`)}
+                                        >
+                                            Shop
+                                        </button>
+                                        <button
+                                            className='btn btn-sm btn-dark'
+                                            onClick={async () => {
+                                                const cartItem = {
+                                                    productId: product._id,
+                                                    quantity: 1,
+                                                    size: product.sizes?.length > 0 ? product.sizes[0] : null,
+                                                    _id: product._id,
+                                                    name: product.name,
+                                                    price: product.price,
+                                                    selectedSize: product.sizes?.length > 0 ? product.sizes[0] : null
+                                                };
 
-                                    if (auth?.token) {
-                                        try {
-                                            const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/cart/add`,
-                                                { productId: cartItem.productId, quantity: cartItem.quantity, size: cartItem.size },
-                                                { headers: { Authorization: `Bearer ${auth.token}` } }
-                                            );
-                                            if (data?.success) {
-                                                toast.success('Item added to cart!');
-                                                const existingItemIndex = cart.findIndex(item => item.product?._id === cartItem.productId && item.size === cartItem.size);
-                                                if (existingItemIndex > -1) {
-                                                    const updatedCart = [...cart];
-                                                    updatedCart[existingItemIndex].quantity += cartItem.quantity;
-                                                    setCart(updatedCart);
+                                                if (auth?.token) {
+                                                    try {
+                                                        const { data } = await axios.post(`${import.meta.env.VITE_API}/api/v1/cart/add`,
+                                                            { productId: cartItem.productId, quantity: cartItem.quantity, size: cartItem.size },
+                                                            { headers: { Authorization: `Bearer ${auth.token}` } }
+                                                        );
+                                                        if (data?.success) {
+                                                            toast.success('Item added to cart!');
+                                                            const existingItemIndex = cart.findIndex(item => item.product?._id === cartItem.productId && item.size === cartItem.size);
+                                                            if (existingItemIndex > -1) {
+                                                                const updatedCart = [...cart];
+                                                                updatedCart[existingItemIndex].quantity += cartItem.quantity;
+                                                                setCart(updatedCart);
+                                                            } else {
+                                                                setCart([...cart, { product: { ...product, _id: cartItem.productId }, quantity: cartItem.quantity, size: cartItem.size }]);
+                                                            }
+                                                        } else {
+                                                            toast.error(data?.message || "Failed to add item.");
+                                                        }
+                                                    } catch (error) {
+                                                        toast.error(error.response?.data?.message || "Error adding item.");
+                                                        console.error("Error adding item via API:", error);
+                                                    }
                                                 } else {
-                                                    setCart([...cart, { product: { ...product, _id: cartItem.productId }, quantity: cartItem.quantity, size: cartItem.size }]);
+                                                    const existingItemIndex = cart.findIndex(item => 
+                                                        item.product?._id === cartItem.productId && item.size === cartItem.size
+                                                    );
+                                                    let updatedCart;
+                                                    if (existingItemIndex > -1) {
+                                                        updatedCart = [...cart];
+                                                        updatedCart[existingItemIndex].quantity += cartItem.quantity;
+                                                    } else {
+                                                        const newItemForLocalStorage = {
+                                                            product: { 
+                                                                _id: cartItem.productId,
+                                                                name: cartItem.name,
+                                                                price: cartItem.price,
+                                                                slug: product.slug, 
+                                                                sizes: product.sizes
+                                                            },
+                                                            quantity: cartItem.quantity,
+                                                            size: cartItem.size
+                                                        };
+                                                        updatedCart = [...cart, newItemForLocalStorage];
+                                                    }
+                                                    setCart(updatedCart);
+                                                    localStorage.setItem('cart', JSON.stringify(updatedCart));
+                                                    toast.success('Item added to cart!');
                                                 }
-                                            } else {
-                                                toast.error(data?.message || "Failed to add item.");
-                                            }
-                                        } catch (error) {
-                                            toast.error(error.response?.data?.message || "Error adding item.");
-                                            console.error("Error adding item via API:", error);
-                                        }
-                                    } else {
-                                        const existingCartItemIndex = cart.findIndex(item => item._id === cartItem._id && item.selectedSize === cartItem.selectedSize);
-                                        let updatedCart;
-                                        if (existingCartItemIndex > -1) {
-                                            updatedCart = [...cart];
-                                            updatedCart[existingCartItemIndex].quantity += cartItem.quantity;
-                                        } else {
-                                            updatedCart = [...cart, cartItem];
-                                        }
-                                        setCart(updatedCart);
-                                        localStorage.setItem('cart', JSON.stringify(updatedCart));
-                                        toast.success('Item added to cart!');
-                                    }
-                                }}
-                            >
-                                Add to Cart <i className="bi bi-cart-plus-fill"></i>
-                            </button>
+                                            }}
+                                        >
+                                            Add to Cart <i className="bi bi-cart-plus-fill"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>
