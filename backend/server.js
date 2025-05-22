@@ -8,10 +8,12 @@ const productRoute = require('./routes/productRoute.js');
 const esewaRoutes = require('./routes/esewaRoutes.js');
 const cartRoute = require('./routes/cartRoute.js');
 const orderRoute = require('./routes/orderRoute.js');
+const chatbotRoute = require('./routes/chatbotRoute.js');
 const cors = require('cors');
 
 //configuring environment
 dotenv.config();
+console.log('DIALOGFLOW_PROJECT_ID:', process.env.DIALOGFLOW_PROJECT_ID);
 
 connectDB()
     .then(() => {
@@ -29,6 +31,7 @@ connectDB()
         app.use('/api/v1/esewa', esewaRoutes);
         app.use('/api/v1/cart', cartRoute);
         app.use('/api/v1/order', orderRoute);
+        app.use('/api/v1/chatbot', chatbotRoute);
 
         app.get('/', (req, res) => {
             res.send(`<h1>Welcome to Omkara</h1>`);

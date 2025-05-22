@@ -28,6 +28,7 @@ import ProductDetails from "./pages/ProductDetails.jsx";
 import CartPage from "./pages/CartPage.jsx";
 import Success from "./components/Success.jsx";
 import Failure from "./components/Failure.jsx";
+import ChatBot from "./components/ChatBot.jsx";
 
 function App() {
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -119,6 +120,7 @@ function App() {
             </Modal.Body>
         </Modal>
 
+        <ChatBot />
     </>
   )
 }

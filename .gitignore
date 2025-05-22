@@ -12,6 +12,8 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
+backend/chat-config/fyp-omkara-98381c9be342.json
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
