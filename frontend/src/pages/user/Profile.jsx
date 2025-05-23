@@ -11,7 +11,6 @@ const Profile = ({ handleShowAuthModal }) => {
     // State for user details
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [displayName, setDisplayName] = useState(''); // Assuming name is display name for now
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     // State for password change
@@ -21,13 +20,10 @@ const Profile = ({ handleShowAuthModal }) => {
 
     // Populate form with user data on load
     useEffect(() => {
-        // Reverted: Expects auth.user to have: name, email, phone
         const { name, email, phone } = auth?.user || {};
-        // Basic name splitting, adjust if your data structure is different
         const nameParts = name?.split(' ') || [];
         setFirstName(nameParts[0] || '');
         setLastName(nameParts.slice(1).join(' ') || '');
-        setDisplayName(name || ''); // Set display name from the full name for now
         setEmail(email || '');
         setPhone(phone || '');
     }, [auth?.user]);
@@ -35,20 +31,17 @@ const Profile = ({ handleShowAuthModal }) => {
     // Handle profile details update
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
-        // Reverted: Combine first and last name
         const fullName = `${firstName} ${lastName}`.trim();
         try {
-            // Reverted: Send combined 'name', email, phone
             const { data } = await axios.put(`${import.meta.env.VITE_API}/api/v1/auth/profile`, {
-                name: fullName, 
-                email,        
+                name: fullName,
+                email,
                 phone,
             });
             if (data?.error) {
                 toast.error(data.error);
             } else {
                 setAuth({ ...auth, user: data?.updatedUser });
-                // Update local storage
                 let ls = localStorage.getItem('auth');
                 ls = JSON.parse(ls);
                 ls.user = data.updatedUser;
@@ -74,25 +67,21 @@ const Profile = ({ handleShowAuthModal }) => {
         }
 
         try {
-            // Assuming a separate endpoint or logic for password change
-            // You might need to adjust the payload based on your API
             const { data } = await axios.put(`${import.meta.env.VITE_API}/api/v1/auth/update-password`, {
-                currentPassword, // Or however your backend expects it
+                currentPassword,
                 newPassword,
             });
-
-            if (data?.error) {
-                toast.error(data.error);
-            } else {
+            if (data?.success) {
                 toast.success('Password updated successfully!');
-                // Clear password fields
                 setCurrentPassword('');
                 setNewPassword('');
                 setConfirmPassword('');
+            } else {
+                toast.error(data?.message || 'Failed to update password');
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response?.data?.message || 'Something went wrong changing password');
+            toast.error(error.response?.data?.message || 'Error updating password');
         }
     };
 
@@ -106,7 +95,6 @@ const Profile = ({ handleShowAuthModal }) => {
         }
     };
 
-
     return (
         <Layout title={"Account Info - Omkara"} handleShowAuthModal={handleShowAuthModal}>
             <div className="dashboard-container profile-container">
@@ -114,109 +102,114 @@ const Profile = ({ handleShowAuthModal }) => {
                     <UserMenu />
                 </div>
                 <div className="dashboard-content">
-                    <h3>Account Details</h3>
-                    <form onSubmit={handleSaveChanges} className="dashboard-form">
-                        {/* Account Details Form */}
-                        <div className="form-row-split mb-3">
-                            <div>
-                                <label htmlFor="firstName" className="form-label">First Name</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="firstName"
-                                    value={firstName}
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="lastName" className="form-label">Last Name</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="lastName"
-                                    value={lastName}
-                                    onChange={(e) => setLastName(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="displayName" className="form-label">Display Name</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="displayName"
-                                value={displayName}
-                                onChange={(e) => setDisplayName(e.target.value)}
-                                // This might be derived from First/Last or be separate
-                            />
-                        </div>
-                        <div className="form-row-split mb-3">
-                            <div>
-                                <label htmlFor="email" className="form-label">Email</label>
-                                <input
-                                    type="email"
-                                    className="form-control"
-                                    id="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    // Consider disabling if email is used for login and not changeable
-                                    // disabled
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="phone" className="form-label">Phone</label>
-                                <input
-                                    type="tel"
-                                    className="form-control"
-                                    id="phone"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                />
+                    <div className="profile-header mb-4">
+                        <h3>Account Settings</h3>
+                        <p className="text-muted">Manage your account information and security settings</p>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-6 mb-4">
+                            <div className="card shadow-sm">
+                                <div className="card-header bg-white">
+                                    <h5 className="mb-0">Personal Information</h5>
+                                </div>
+                                <div className="card-body">
+                                    <form onSubmit={handleProfileUpdate}>
+                                        <div className="row mb-3">
+                                            <div className="col-md-6">
+                                                <label htmlFor="firstName" className="form-label">First Name</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="firstName"
+                                                    value={firstName}
+                                                    onChange={(e) => setFirstName(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="col-md-6">
+                                                <label htmlFor="lastName" className="form-label">Last Name</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="lastName"
+                                                    value={lastName}
+                                                    onChange={(e) => setLastName(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="mb-3">
+                                            <label htmlFor="email" className="form-label">Email Address</label>
+                                            <input
+                                                type="email"
+                                                className="form-control"
+                                                id="email"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label htmlFor="phone" className="form-label">Phone Number</label>
+                                            <input
+                                                type="tel"
+                                                className="form-control"
+                                                id="phone"
+                                                value={phone}
+                                                onChange={(e) => setPhone(e.target.value)}
+                                            />
+                                        </div>
+                                        <button type="submit" className="btn btn-primary">
+                                            Update Profile
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Password Change Section */}
-                        <div className="password-change-section">
-                            <h4>Password Change:</h4>
-                            <div className="mb-3">
-                                <label htmlFor="currentPassword" className="form-label">Current Password</label>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    id="currentPassword"
-                                    value={currentPassword}
-                                    onChange={(e) => setCurrentPassword(e.target.value)}
-                                    placeholder="Leave blank to keep unchanged"
-                                />
-                            </div>
-                            <div className="mb-3">
-                                <label htmlFor="newPassword" className="form-label">New Password</label>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    id="newPassword"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    placeholder="Leave blank to keep unchanged"
-                                />
-                            </div>
-                            <div className="mb-3">
-                                <label htmlFor="confirmPassword" className="form-label">Re-type New Password</label>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    id="confirmPassword"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="Leave blank to keep unchanged"
-                                />
+                        <div className="col-md-6">
+                            <div className="card shadow-sm">
+                                <div className="card-header bg-white">
+                                    <h5 className="mb-0">Change Password</h5>
+                                </div>
+                                <div className="card-body">
+                                    <form onSubmit={handlePasswordChange}>
+                                        <div className="mb-3">
+                                            <label htmlFor="currentPassword" className="form-label">Current Password</label>
+                                            <input
+                                                type="password"
+                                                className="form-control"
+                                                id="currentPassword"
+                                                value={currentPassword}
+                                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label htmlFor="newPassword" className="form-label">New Password</label>
+                                            <input
+                                                type="password"
+                                                className="form-control"
+                                                id="newPassword"
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label htmlFor="confirmPassword" className="form-label">Confirm New Password</label>
+                                            <input
+                                                type="password"
+                                                className="form-control"
+                                                id="confirmPassword"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                            />
+                                        </div>
+                                        <button type="submit" className="btn btn-primary">
+                                            Change Password
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-
-                        <button type="submit" className="btn-save-changes">
-                            Save Changes
-                        </button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </Layout>

@@ -57,7 +57,7 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
     }
     return (
         <div className="login-container" style={{minHeight: '50vh'}}>
-            <Row>
+            <Row className="g-0">
                 <Col md={7} className="d-none d-md-block">
                     <img
                         src="/icon.jpg"
@@ -65,52 +65,53 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
                         className="img-fluid" style={{height: '80vh'}}
                     />
                 </Col>
-                <Col xs={12} md={4} >
-                    <h2 className="mb-4 mt-0 pt-5 ">Log In</h2>
-                    <form onSubmit={handleSubmit}>
-                        <div className="mb-3">
-                            <label htmlFor="registerEmail" className="form-label">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="form-control"
-                                id="registerEmail"
-                                placeholder="Enter Email"
-                                required
-                            />
-                        </div>
-                        <div className="mb-2">
-                            <label htmlFor="registerPassword" className="form-label">
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="form-control"
-                                id="registerPassword"
-                                placeholder="Enter Password"
-                                required
-                            />
-                        </div>
-                        <div onClick={handleShowForgotPassword} className="text-decoration-underline mb-3" style={{ cursor: "pointer" }}>
-                            Forgot Password?
-                        </div>
-                        <button type="submit" className="btn w-100 mb-3" style={{backgroundColor: '#74ab6a'}}>
-                            Login
-                        </button>
-
-                        <div className="text-center">
-                            Don't have an account?{' '}
-                            <span
-                                style={{color: 'blue', cursor: 'pointer'}}
-                                onClick={handleShowRegister}
-                            >SignUp</span>
-                        </div>
-                    </form>
+                <Col xs={12} md={5} className="d-flex align-items-center justify-content-center" style={{ minHeight: '80vh', background: '#e9f5e9', borderTopRightRadius: '20px', borderBottomRightRadius: '20px' }}>
+                    <div style={{ width: '100%', padding: '2rem 1rem' }}>
+                        <h2 className="mb-4 mt-0 pt-5 ">Log In</h2>
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-3">
+                                <label htmlFor="registerEmail" className="form-label">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="form-control"
+                                    id="registerEmail"
+                                    placeholder="Enter Email"
+                                    required
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label htmlFor="registerPassword" className="form-label">
+                                    Password
+                                </label>
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="form-control"
+                                    id="registerPassword"
+                                    placeholder="Enter Password"
+                                    required
+                                />
+                            </div>
+                            <div onClick={handleShowForgotPassword} className="text-decoration-underline mb-3" style={{ cursor: "pointer" }}>
+                                Forgot Password?
+                            </div>
+                            <button type="submit" className="btn w-100 mb-3" style={{backgroundColor: '#74ab6a'}}>
+                                Login
+                            </button>
+                            <div className="text-center">
+                                Don't have an account?{' '}
+                                <span
+                                    style={{color: 'blue', cursor: 'pointer'}}
+                                    onClick={handleShowRegister}
+                                >SignUp</span>
+                            </div>
+                        </form>
+                    </div>
                 </Col>
             </Row>
         </div>

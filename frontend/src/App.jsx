@@ -104,16 +104,18 @@ function App() {
         <Modal show={showAuthModal} onHide={handleCloseAuthModal} centered
         size="lg"
         dialogClassName="auth-modal">
-            <Modal.Header closeButton>
-                <Modal.Title>
-                    {modalContent === "register" ? "Sign Up" : modalContent === "login" ? "Login" : "Forgot Password"}
-                </Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="p-0">
+            <Modal.Body className="p-0 position-relative">
+                <button
+                    className="modal-close-btn"
+                    onClick={handleCloseAuthModal}
+                    aria-label="Close"
+                >
+                    ×
+                </button>
                 {modalContent === "register" ? (
                     <Register handleShowLogin={handleShowLogin} />
                 ) : modalContent === "login" ? (
-                    <Login handleShowRegister={handleShowRegister} handleShowForgotPassword={handleForgotPass} handleCloseAuthModal={handleCloseAuthModal} />
+                    <Login handleShowRegister={handleShowRegister} handleShowForgotPassword={handleForgotPass} />
                 ) : (
                     <ForgotPassword handleShowLogin={handleShowLogin} />
                 )}

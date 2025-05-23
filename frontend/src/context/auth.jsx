@@ -30,7 +30,7 @@ const AuthProvider = ({ children }) => {
                         // Temporarily set header for verification request
                         axios.defaults.headers.common["Authorization"] = `Bearer ${parseData.token}`;
                         // Verify token with backend using the existing user-auth endpoint
-                        const response = await axios.get('/api/v1/auth/user-auth');
+                        const response = await axios.get(`${import.meta.env.VITE_API}/api/v1/auth/user-auth`);
                         if (isMounted && response.data.ok) {
                             // Token is valid, set auth state
                             setAuth({

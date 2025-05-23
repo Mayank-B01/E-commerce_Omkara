@@ -19,6 +19,8 @@ const Homepage = ({ handleShowAuthModal }) => {
     const [trendingProducts, setTrendingProducts] = useState([]);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [heroProducts, setHeroProducts] = useState([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalImage, setModalImage] = useState(null);
 
     // Fetch all products
     const getAllProducts = async () => {
@@ -78,22 +80,41 @@ const Homepage = ({ handleShowAuthModal }) => {
 
     }, []); // Run only once on mount
 
+    const openModal = (imgUrl) => {
+        setModalImage(imgUrl);
+        setModalOpen(true);
+    };
+    const closeModal = () => {
+        setModalOpen(false);
+        setModalImage(null);
+    };
+
     return (
         <Layout title={'Omkara - Home'} handleShowAuthModal={handleShowAuthModal}>
             {/* Hero Section */}
             <section className="hero-section">
-                <div className="hero-content">
-                    <div className="hero-carousel">
-                        {heroProducts.map((product, index) => (
+                <div className="hero-aspect-ratio">
+                    {heroProducts.map((product, index) => {
+                        const imgUrl = `${import.meta.env.VITE_API}/api/v1/product/product-photos/${product._id}?first=true`;
+                        return (
                             <div 
                                 key={product._id}
                                 className={`carousel-slide ${index === currentSlide ? 'active' : ''}`}
                             >
                                 <img 
-                                    src={`${import.meta.env.VITE_API}/api/v1/product/product-photos/${product._id}?first=true`}
+                                    src={imgUrl}
                                     alt={product.name} 
                                     onError={(e) => { e.target.onerror = null; e.target.src="/images/placeholder.png"}}
                                 />
+                                {/* View Full Image Button */}
+                                <button
+                                    className="view-full-btn"
+                                    title="View Full Image"
+                                    onClick={() => openModal(imgUrl)}
+                                    style={{ position: 'absolute', top: 20, left: 20, zIndex: 3, background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '20px', padding: '6px 16px', cursor: 'pointer', fontWeight: 500, fontSize: '1rem', color: '#333', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+                                >
+                                    View Full Image
+                                </button>
                                 <div className="featured-badge">New Arrival</div>
                                 <div className="hero-text">
                                     <h2>{product.name}</h2>
@@ -103,18 +124,27 @@ const Homepage = ({ handleShowAuthModal }) => {
                                     </Link>
                                 </div>
                             </div>
+                        );
+                    })}
+                    <div className="carousel-dots">
+                        {heroProducts.map((_, index) => (
+                            <button
+                                key={index}
+                                className={`dot ${index === currentSlide ? 'active' : ''}`}
+                                onClick={() => setCurrentSlide(index)}
+                            />
                         ))}
-                        <div className="carousel-dots">
-                            {heroProducts.map((_, index) => (
-                                <button
-                                    key={index}
-                                    className={`dot ${index === currentSlide ? 'active' : ''}`}
-                                    onClick={() => setCurrentSlide(index)}
-                                />
-                            ))}
-                        </div>
                     </div>
                 </div>
+                {/* Modal for full image */}
+                {modalOpen && (
+                    <div className="modal-overlay" onClick={closeModal}>
+                        <div className="modal-content" onClick={e => e.stopPropagation()}>
+                            <button className="modal-close" onClick={closeModal} title="Close" style={{position:'absolute',top:10,right:10,background:'rgba(0,0,0,0.5)',color:'#fff',border:'none',borderRadius:'50%',width:32,height:32,fontSize:20,cursor:'pointer',zIndex:10}}>&times;</button>
+                            <img src={modalImage} alt="Full" style={{maxWidth:'90vw',maxHeight:'80vh',objectFit:'contain',background:'#eee',display:'block',margin:'0 auto'}} />
+                        </div>
+                    </div>
+                )}
             </section>
 
             {/* Categories Grid */}

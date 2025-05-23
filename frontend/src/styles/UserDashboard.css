@@ -9,20 +9,23 @@
 
 .dashboard-menu {
     flex: 0 0 200px; /* Fixed width for the menu */
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .dashboard-content {
     flex: 1; /* Content takes remaining space */
-    background-color: #a3b18a; /* Green background from screenshot */
+    background-color: #e9f5e9; /* Soft green background */
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* Content Area Specific Styles (Placeholders, adjust as needed) */
 .dashboard-content h3,
 .dashboard-content h4 {
-    color: #343a40;
+    color: #2c3e50;
     margin-bottom: 20px;
 }
 
@@ -109,11 +112,18 @@
 .order-item {
     display: flex;
     align-items: center;
-    background-color: #f8f9fa; /* Lighter background for contrast */
+    background-color: #fff;
     padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+    border: 1px solid #d4e3d4;
+}
+
+.order-item:hover {
+    background-color: #f0f7f0;
+    border-color: #a3b18a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .order-item img {
@@ -153,4 +163,306 @@
 
 .btn-go-to-product:hover {
     background-color: #dee2e6;
-} 
+}
+
+/* Profile Styles */
+.profile-container {
+    padding: 20px;
+}
+
+.profile-header {
+    border-bottom: 1px solid #d4e3d4;
+    padding-bottom: 15px;
+}
+
+.profile-header h3 {
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.card {
+    border: 1px solid #d4e3d4; /* Light green border */
+    background-color: #fff;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #f0f7f0; /* Very light green */
+    border-bottom: 1px solid #d4e3d4;
+    padding: 15px 20px;
+}
+
+.card-header h5 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+}
+
+.card-body {
+    background-color: #fff;
+    padding: 20px;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-control {
+    border: 1px solid #d4e3d4;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.form-control:focus {
+    border-color: #a3b18a;
+    box-shadow: 0 0 0 0.2rem rgba(163, 177, 138, 0.25);
+}
+
+.btn-primary {
+    background-color: #a3b18a;
+    border: none;
+    padding: 8px 20px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #8a9a6b;
+}
+
+/* Order History Styles */
+.order-history-container {
+    padding: 20px;
+}
+
+.order-history-header {
+    border-bottom: 1px solid #d4e3d4;
+    padding-bottom: 15px;
+}
+
+.order-history-header h3 {
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.order-item-image-container {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.order-item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.order-item-details {
+    flex-grow: 1;
+    padding-right: 20px;
+}
+
+.order-item-details h5 {
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.order-item-details p {
+    margin-bottom: 4px;
+    color: #6c757d;
+}
+
+.badge {
+    padding: 8px 12px;
+    font-weight: 500;
+    border-radius: 20px;
+}
+
+.badge.bg-success {
+    background-color: #a3b18a !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000;
+}
+
+.badge.bg-info {
+    background-color: #8a9a6b !important;
+}
+
+.btn-outline-primary {
+    border: 1px solid #a3b18a;
+    color: #a3b18a;
+    padding: 6px 15px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+    background-color: #a3b18a;
+    color: #fff;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .order-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .order-item-image-container {
+        margin: 0 auto 15px;
+    }
+
+    .order-item-details {
+        padding-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .btn-outline-primary {
+        width: 100%;
+    }
+}
+
+/* User Menu Styles */
+.list-group {
+    border: none;
+    padding: 10px;
+}
+
+.list-group-item {
+    border: none;
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border-radius: 5px !important;
+    color: #495057;
+    transition: all 0.2s ease;
+    background-color: #fff;
+}
+
+.list-group-item:hover {
+    background-color: #f0f7f0;
+    color: #2c3e50;
+}
+
+.list-group-item.active-custom {
+    background-color: #a3b18a;
+    color: #fff;
+}
+
+/* Responsive Dashboard */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .dashboard-menu {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .dashboard-content {
+        margin: 10px;
+    }
+}
+
+/* --- Modern Dashboard Additions --- */
+.dashboard-welcome {
+    margin-bottom: 2rem;
+}
+
+.profile-card, .address-card {
+    border: 1px solid #d4e3d4;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(163, 177, 138, 0.08);
+    padding: 0;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #e9f5e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: #e9f5e9;
+    border-radius: 50%;
+}
+
+.profile-card h4 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.profile-card .btn,
+.address-card .btn {
+    border-radius: 20px;
+    font-weight: 500;
+    border: 1px solid #a3b18a;
+    color: #a3b18a;
+    background: #fff;
+    transition: all 0.2s;
+}
+.profile-card .btn:hover,
+.address-card .btn:hover {
+    background: #a3b18a;
+    color: #fff;
+}
+
+.address-card h5 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.address-card p {
+    color: #495057;
+}
+
+/* Quick stats icons */
+.text-success {
+    color: #a3b18a !important;
+}
+
+/* Responsive adjustments for dashboard cards */
+@media (max-width: 991px) {
+    .row.g-4 > .col-md-5, .row.g-4 > .col-md-7 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* --- End Modern Dashboard Additions --- */ 
