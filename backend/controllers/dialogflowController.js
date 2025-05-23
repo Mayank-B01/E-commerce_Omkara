@@ -58,6 +58,65 @@ const checkProductAvailability = async (productName) => {
     }
 };
 
+const getPaymentMethodsInfo = (paymentType) => {
+    const allPaymentMethods = {
+        "esewa": "Yes, we accept eSewa payments. You can pay using eSewa during checkout.",
+        "cash on delivery": "Yes, we offer cash on delivery for orders within Kathmandu Valley."
+    };
+
+    if (paymentType) {
+        const method = paymentType.toLowerCase();
+        return allPaymentMethods[method] || "We accept various payment methods including eSewa, cash on delivery, bank transfer, credit cards, and debit cards.";
+    }
+
+    return "We currently accept e-Sewa only at the moment.\n" ;
+};
+
+const getSupportContactInfo = (issueType) => {
+    const supportInfo = {
+        "order": "For order-related issues, please contact our order support team:\n" +
+                "- Phone: +977-1234567890\n" +
+                "- Email: orders@omkara.com\n" +
+                "- Hours: 9 AM - 6 PM, Monday to Saturday",
+        "product": "For product-related queries, please contact our product support:\n" +
+                  "- Phone: +977-1234567891\n" +
+                  "- Email: products@omkara.com\n" +
+                  "- Hours: 9 AM - 6 PM, Monday to Saturday",
+        "payment": "For payment-related issues, please contact our payment support:\n" +
+                  "- Phone: +977-1234567892\n" +
+                  "- Email: payments@omkara.com\n" +
+                  "- Hours: 9 AM - 6 PM, Monday to Saturday",
+        "delivery": "For delivery-related queries, please contact our delivery team:\n" +
+                   "- Phone: +977-1234567893\n" +
+                   "- Email: delivery@omkara.com\n" +
+                   "- Hours: 9 AM - 6 PM, Monday to Saturday",
+        "return": "For return-related issues, please contact our returns department:\n" +
+                 "- Phone: +977-1234567894\n" +
+                 "- Email: returns@omkara.com\n" +
+                 "- Hours: 9 AM - 6 PM, Monday to Saturday",
+        "general": "For general inquiries, please contact our customer service:\n" +
+                  "- Phone: +977-1234567895\n" +
+                  "- Email: support@omkara.com\n" +
+                  "- Hours: 9 AM - 6 PM, Monday to Saturday"
+    };
+
+    if (issueType) {
+        return supportInfo[issueType.toLowerCase()] || 
+               "Please contact our customer service:\n" +
+               "- Phone: +977-1234567895\n" +
+               "- Email: support@omkara.com\n" +
+               "- Hours: 9 AM - 6 PM, Monday to Saturday";
+    }
+
+    return "You can reach our customer support through:\n" +
+           "- Phone: +977-1234567895\n" +
+           "- Email: support@omkara.com\n" +
+           "- Live Chat: Available on our website\n" +
+           "- Store Visit: Visit our physical stores in Hadigaun or Patan\n\n" +
+           "Support Hours: 9 AM - 6 PM, Monday to Saturday\n" +
+           "For urgent matters, please call our support line.";
+};
+
 const processMessage = async (req, res) => {
     const projectId = process.env.DIALOGFLOW_PROJECT_ID;
     if (!projectId) {
@@ -97,14 +156,33 @@ const processMessage = async (req, res) => {
         // Handle parameters based on intent
         let reply = result.fulfillmentText;
         
-        if (result.intent.displayName === 'product.information' && result.parameters.fields.product_name) {
-            reply = await getProductInfo(result.parameters.fields.product_name.stringValue);
-        }
-        else if (result.intent.displayName === 'order.tracking' && result.parameters.fields.order_id) {
-            reply = await getOrderStatus(result.parameters.fields.order_id.stringValue);
-        }
-        else if (result.intent.displayName === 'product.availability' && result.parameters.fields.product_name) {
-            reply = await checkProductAvailability(result.parameters.fields.product_name.stringValue);
+        switch (result.intent.displayName) {
+            case 'product.information':
+                if (result.parameters.fields.product_name) {
+                    reply = await getProductInfo(result.parameters.fields.product_name.stringValue);
+                }
+                break;
+            
+            case 'order.tracking':
+                if (result.parameters.fields.order_id) {
+                    reply = await getOrderStatus(result.parameters.fields.order_id.stringValue);
+                }
+                break;
+            
+            case 'product.availability':
+                if (result.parameters.fields.product_name) {
+                    reply = await checkProductAvailability(result.parameters.fields.product_name.stringValue);
+                }
+                break;
+            
+            case 'payment.methods':
+                const paymentType = result.parameters.fields.payment_type?.stringValue;
+                reply = getPaymentMethodsInfo(paymentType);
+                break;
+            
+            case 'support.contact':
+                const issueType = result.parameters.fields.issue_type?.stringValue;
+                break;
         }
 
         res.json({

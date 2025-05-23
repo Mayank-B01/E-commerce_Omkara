@@ -303,6 +303,24 @@ const handleEsewaSuccessCallback = async (req, res) => {
                  await newOrder.save();
                  console.log(`[eSewa Success Callback] New order created successfully. Order ID: ${newOrder._id}, Transaction: ${esewaOrderId}`);
 
+                 // --- Decrement Product Stock ---
+                 for (const item of itemsToOrder) {
+                     try {
+                         const product = await productModel.findById(item.product);
+                         if (product) {
+                             // Ensure stock doesn't go below zero (optional, but good practice)
+                             product.quantity = Math.max(0, product.quantity - item.quantity);
+                             await product.save();
+                             console.log(`[eSewa Success Callback] Decremented stock for product ${item.product} by ${item.quantity}. New stock: ${product.quantity}`);
+                         } else {
+                             console.warn(`[eSewa Success Callback] Product not found for ID ${item.product} during stock decrement.`);
+                         }
+                     } catch (stockError) {
+                         console.error(`[eSewa Success Callback] Error decrementing stock for product ${item.product}:`, stockError);
+                         // Decide how to handle stock update errors (e.g., log and continue, or attempt rollback)
+                     }
+                 }
+
                  // 7. Remove **ordered items** from User's Cart
                  const orderedItemIds = new Set(itemsToOrder.map(item => `${item.product}${item.size ? `_${item.size}` : '_'}`));
                  user.cart = user.cart.filter(cartItem => {
