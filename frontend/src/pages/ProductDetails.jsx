@@ -371,6 +371,10 @@ const ProductDetails = ({ handleShowAuthModal }) => {
 
                         <h4 className="mb-4 price-display">Price: Rs {product.price?.toFixed(2) || '0.00'}</h4>
 
+                        {product.quantity < 10 && (
+                            <p className="low-stock-indicator" style={{ color: 'red', fontWeight: 'bold' }}>Low Stock!</p>
+                        )}
+
                         <div className="d-flex action-buttons mb-4">
                             <button
                                 className={`btn btn-dark flex-grow-1 me-2 ${!product._id ? 'disabled' : ''}`}
