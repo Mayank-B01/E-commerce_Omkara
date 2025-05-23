@@ -4,6 +4,8 @@ import { FaGoogle } from 'react-icons/fa';
 import { Row, Col } from 'react-bootstrap';
 import {toast} from 'react-toastify';
 import axios from 'axios';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
+import { Input } from 'antd';
 
 
 const Register = ({ handleShowLogin, handleCloseAuthModal }) => {
@@ -108,28 +110,26 @@ const Register = ({ handleShowLogin, handleCloseAuthModal }) => {
                                 <label htmlFor="registerPassword" className="form-label">
                                     Password
                                 </label>
-                                <input
-                                    type="password"
+                                <Input.Password
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="form-control"
-                                    id="registerPassword"
                                     placeholder="Enter Password"
                                     required
+                                    className="form-control"
+                                    id="registerPassword"
                                 />
                             </div>
                             <div className="mb-4">
                                 <label htmlFor="registerConfirmPassword" className="form-label">
                                     Re-type Password
                                 </label>
-                                <input
-                                    type="password"
+                                <Input.Password
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="form-control"
-                                    id="registerConfirmPassword"
                                     placeholder="Confirm Password"
                                     required
+                                    className="form-control"
+                                    id="registerConfirmPassword"
                                 />
                             </div>
                             <div className="mb-4">

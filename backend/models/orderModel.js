@@ -16,18 +16,14 @@ const orderSchema = new mongoose.Schema({
                 type: String,
                 required: false
             }
-            // Store price at the time of order if prices can change
-            // price: { 
-            //     type: Number,
-            //     required: true
-            // }
+
         }
     ],
     payment: {
-        transaction_uuid: { type: String, unique: true }, // From eSewa
-        transaction_code: { type: String }, // From eSewa
+        transaction_uuid: { type: String, unique: true },
+        transaction_code: { type: String },
         amount: { type: Number },
-        status: { type: String }, // e.g., 'COMPLETE'
+        status: { type: String },
         method: { type: String, default: 'eSewa' }
     },
     buyer: {

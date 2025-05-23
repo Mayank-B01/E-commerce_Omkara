@@ -115,7 +115,7 @@ function App() {
                 {modalContent === "register" ? (
                     <Register handleShowLogin={handleShowLogin} />
                 ) : modalContent === "login" ? (
-                    <Login handleShowRegister={handleShowRegister} handleShowForgotPassword={handleForgotPass} />
+                    <Login handleShowRegister={handleShowRegister} handleShowForgotPassword={handleForgotPass} handleCloseAuthModal={handleCloseAuthModal} />
                 ) : (
                     <ForgotPassword handleShowLogin={handleShowLogin} />
                 )}

@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
 const pendingOrderSchema = new mongoose.Schema({
-    // Unique ID generated before sending to eSewa (e.g., OMK-timestamp-userId)
+
     orderId: {
         type: String,
         required: true,
         unique: true,
-        index: true, // Index for faster lookup
+        index: true,
     },
-    // Array of items selected for this specific transaction
+
     items: [
         {
             product: {
@@ -24,14 +24,14 @@ const pendingOrderSchema = new mongoose.Schema({
                 type: String,
                 required: false
             },
-            // Store price verified from DB during initiation
+
             price: { 
                 type: Number,
                 required: true
             }
         }
     ],
-     // Link to the user making the purchase
+
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',

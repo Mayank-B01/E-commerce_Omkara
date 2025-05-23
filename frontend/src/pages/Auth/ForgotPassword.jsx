@@ -2,6 +2,8 @@ import React,{useState} from 'react';
 import {Col, Row} from "react-bootstrap";
 import {toast} from "react-toastify";
 import axios from "axios";
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
+import { Input } from 'antd';
 
 const ForgotPassword = ({ handleShowLogin, handleCloseAuthModal }) =>{
     const [email, setEmail] = useState('');
@@ -81,14 +83,13 @@ const ForgotPassword = ({ handleShowLogin, handleCloseAuthModal }) =>{
                                 <label htmlFor="registerNewPassword" className="form-label">
                                     New Password
                                 </label>
-                                <input
-                                    type="password"
+                                <Input.Password
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="form-control"
-                                    id="NewPassword"
                                     placeholder="Enter New Password"
                                     required
+                                    className="form-control"
+                                    id="NewPassword"
                                 />
                             </div>
                             <button type="submit" className="btn w-100 mb-3" style={{backgroundColor: '#74ab6a'}}>

@@ -123,7 +123,7 @@ const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
             // Append multiple photos
             if (photoFiles.length > 0) {
                  Array.from(photoFiles).forEach(file => {
-                    productData.append("photos", file); // Use "photos" as the key
+                    productData.append("photos", file);
                  });
             }
             productData.append("category", category);
@@ -141,9 +141,9 @@ const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
 
             if (data?.success) {
                 toast.success(`Product ${initialData ? "Updated" : "Added"} Successfully`);
-                onSuccess(); // Refresh product list
-                onCancel(); // Close modal
-                 resetForm(); // Reset form state after successful submission
+                onSuccess();
+                onCancel();
+                 resetForm();
             } else {
                  // Handle specific error messages from backend if available
                  toast.error(data?.message || "Failed to save product.");
@@ -161,7 +161,7 @@ const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
             open={visible}
             onCancel={() => { resetForm(); onCancel(); }} // Ensure form resets on cancel
             footer={null}
-            width={800} // Increase modal width potentially
+            width={800}
         >
             <form onSubmit={handleSubmit}>
                 {/* Category Select */}
@@ -193,10 +193,10 @@ const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
                         {photoFiles.length > 0 ? `${photoFiles.length} photos selected` : initialData ? "Upload New Photos (Replaces All)" : "Upload Photos"}
                         <input
                             type="file"
-                            name="photos" // Match backend expected key
+                            name="photos"
                             accept="image/*"
-                            onChange={handleFileChange} // Use updated handler
-                            multiple // Allow multiple files
+                            onChange={handleFileChange}
+                            multiple
                             hidden
                         />
                     </label>
@@ -298,9 +298,9 @@ const ProductModal = ({ visible, onCancel, onSuccess, initialData }) => {
                                  key={color}
                                  closable
                                  onClose={() => handleRemoveColor(color)}
-                                 color={color} // Use color string directly for Tag background
+                                 color={color}
                                  style={{ 
-                                     color: 'white', // Adjust text color for visibility if needed
+                                     color: 'white',
                                      textShadow: '0 0 2px black' 
                                  }}
                              >
