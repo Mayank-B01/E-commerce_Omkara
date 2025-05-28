@@ -69,7 +69,7 @@ const ChatBot = () => {
                             </svg>
                         </Button>
                     </div>
-                    
+
                     <div className="flex-grow-1 overflow-auto p-3" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {messages.map((message, index) => (
                             <div
@@ -110,4 +110,4 @@ const ChatBot = () => {
     );
 };
 
-export default ChatBot; 
+export default ChatBot;

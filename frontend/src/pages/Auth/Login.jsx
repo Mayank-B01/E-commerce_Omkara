@@ -5,6 +5,8 @@ import {useAuth} from "../../context/auth.jsx";
 import { useCart } from "../../context/cart.jsx";
 import axios from "axios";
 import { useNavigate, useLocation } from 'react-router-dom';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
+import { Input } from 'antd';
 
 const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthModal}) => {
     const [email, setEmail] = useState('');
@@ -37,6 +39,7 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
                 setCart(cartData);
                 localStorage.removeItem('cart');
 
+                handleCloseAuthModal();
                 if (userData.role === 1) {
                     navigate('/dashboard/admin');
                 } else {
@@ -44,7 +47,7 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
                     navigate(from);
                 }
                 
-                handleCloseAuthModal();
+
             }
             else{
                 toast.error(res.data.message);
@@ -87,14 +90,13 @@ const Login = ({ handleShowRegister ,handleShowForgotPassword, handleCloseAuthMo
                                 <label htmlFor="registerPassword" className="form-label">
                                     Password
                                 </label>
-                                <input
-                                    type="password"
+                                <Input.Password
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="form-control"
-                                    id="registerPassword"
                                     placeholder="Enter Password"
                                     required
+                                    className="form-control"
+                                    id="registerPassword"
                                 />
                             </div>
                             <div onClick={handleShowForgotPassword} className="text-decoration-underline mb-3" style={{ cursor: "pointer" }}>
