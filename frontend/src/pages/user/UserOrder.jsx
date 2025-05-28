@@ -77,7 +77,7 @@ const UserOrder = ({ handleShowAuthModal }) => {
                                         </div>
                                         <div className="col-md-6 text-md-end">
                                             <p className="mb-1"><strong>Total Amount:</strong></p>
-                                            <h4 className="text-primary mb-0">Rs {order.payment?.amount}</h4>
+                                            <h4 className="mb-0">Rs {order.payment?.amount}</h4>
                                         </div>
                                     </div>
 
@@ -99,7 +99,7 @@ const UserOrder = ({ handleShowAuthModal }) => {
                                                     <h5>{item.product?.name}</h5>
                                                     {item.size && <p className="mb-1"><small>Size: {item.size}</small></p>}
                                                     <p className="mb-1"><small>Quantity: {item.quantity}</small></p>
-                                                    <p className="mb-0">Price: Rs {item.product?.price}</p>
+                                                    <p className="mb-0" style={{ color: 'black' }}>Price: Rs {item.product?.price}</p>
                                                 </div>
                                                 {item.product?.slug && 
                                                     <Link 

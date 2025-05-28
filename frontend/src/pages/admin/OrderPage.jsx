@@ -79,7 +79,7 @@ const OrderPage = () => {
 
     const handleChange = async (orderId, value) => {
         try {
-            await axios.put(`${import.meta.env.VITE_API}/api/v1/order/order-status/${orderId}`, {
+            await axios.put(`${import.meta.env.VITE_API}/api/v1/order/update-status/${orderId}`, {
                 status: value,
             });
             getOrders(filteredUserId);
